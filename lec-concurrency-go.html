@@ -1,0 +1,1913 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Martin Sulzmann" />
+  <title>Die Programmiersprache Go</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Die Programmiersprache Go</h1>
+  <p class="author">
+Martin Sulzmann
+  </p>
+</div>
+<div id="go" class="slide section level1">
+<h1>Go</h1>
+<p>Programmiersprache entwickelt von Google: <a href="Go">http://golang.org/</a></p>
+<ul>
+<li>Angelehnt an C</li>
+<li>Statisches Typsystem</li>
+<li>Funktionen höherer Ordung</li>
+<li>Garbage Collection</li>
+<li>Objekt-orientierung durch Typschnittstellen (keine Klassen aber Methoden können Typen zugewiesen werden)</li>
+<li><em>Unterstützung von Nebenläufigkeit und Kommunikation</em>
+<ul>
+<li>Leichtgewichtige Threads</li>
+<li>Kommunikation via Kanälen
+<ul>
+<li>Formal fundiert: Communicating Sequential Processes, Sir Tony Hoare</li>
+</ul></li>
+<li>Philosophie: “Do not communicate by sharing memory. Instead share by communicating.”</li>
+</ul></li>
+</ul>
+</div>
+<div id="hello-world" class="slide section level1">
+<h1>Hello World</h1>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+
+<span class="kw">var</span> x <span class="dt">int</span>
+
+<span class="kw">func</span> hi(y <span class="dt">int</span>) {
+        fmt.Printf(<span class="st">&quot;hi %d</span><span class="ch">\n</span><span class="st">&quot;</span>,y)
+}
+
+<span class="kw">func</span> main() {
+    x= <span class="dv">1</span>
+    hi(x)
+    fmt.Printf(<span class="st">&quot;hello, world</span><span class="ch">\n</span><span class="st">&quot;</span>)
+}</code></pre></div>
+<ul>
+<li>Typdeklarationen in 'logischer' Reihenfolge
+<ul>
+<li><code>var varName varType</code></li>
+<li>Eine Variable <code>varName</code> mit dem Typ <code>varType</code></li>
+</ul></li>
+<li>Eine Statement pro Zeile. Semikolon redundant.</li>
+</ul>
+</div>
+<div id="go-toolchain" class="slide section level1">
+<h1>Go Toolchain</h1>
+<ul>
+<li>Ausführung via der &quot;Kommandozeile&quot;
+<ul>
+<li><p><code>go run hello.go</code></p></li>
+<li><code>gofmt hello.go</code>
+<ul>
+<li>Automatischer &quot;pretty printer&quot;</li>
+<li>Ausgabe auf Konsole per Default</li>
+<li><code>gofmt -w hello.go</code> schreibt ins gleiche File</li>
+</ul></li>
+<li><p>Den Editor können Sie frei wählen (emacs, ...)</p></li>
+</ul></li>
+<li>Falls Sie eine IDE suchen: <a href="IDE%20Go">http://code.google.com/p/liteide/</a></li>
+</ul>
+<p>Zur Info, unsere Programme bestimmen immer aus einer Datei.</p>
+</div>
+<div id="nebenläufigkeit-goroutine" class="slide section level1">
+<h1>Nebenläufigkeit (goroutine)</h1>
+<p>Nebenläufige Ausführung: &quot;just say go&quot;</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">func</span> thread(s <span class="dt">string</span>) {
+    <span class="kw">for</span> {
+        fmt.Print(s)
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+    }
+}
+
+<span class="kw">func</span> main() {
+
+    <span class="kw">go</span> thread(<span class="st">&quot;A&quot;</span>)
+    <span class="kw">go</span> thread(<span class="st">&quot;B&quot;</span>)
+    thread(<span class="st">&quot;C&quot;</span>)
+}</code></pre></div>
+<ul>
+<li><p><code>go</code> auch bekannt als &quot;fork&quot; oder &quot;spawn&quot;</p></li>
+<li><p>Nebenläufige Ausführung des Statements, hier der Funktionen thread(&quot;A&quot;) und thread(&quot;B&quot;).</p></li>
+<li><p>Beachte, thread(&quot;C&quot;) wird im Haupt-thread ausgeführt. Sprich, es werden drei Threads nebenläufig ausgeführt.</p></li>
+<li><p>Scheduling der Threads wird vom Laufzeitsysteme verwaltet.</p></li>
+<li><p>Sobald der Haupt-thread terminiert werden alle innerhalb des Haupt-threads gestarteten Threads terminiert (dies ist anders als in Java)</p></li>
+</ul>
+<h2 id="multi-threading-in-go">Multi-threading in Go</h2>
+<h3 id="terminologie">Terminologie</h3>
+<p>Thread = Sequenz von hintereinander ausgeführten Anweisungen</p>
+<p>Threadzustand:</p>
+<ul>
+<li><p>Running (wird gerade ausgefuehrt)</p></li>
+<li><p>Waiting (koennte ausgefuehrt werden aber keine CPU verfuegbar)</p></li>
+<li><p>Blocked (kann nicht ausgefuehrt werden)</p></li>
+</ul>
+<p>Multithreading = Abwechselnde Ausführung von mehreren Threads auf einer CPU</p>
+<p>Scheduling = Systematisches Vorghen zum Multithreading</p>
+<p>Preemptiv = Jeder Thread bekommt eine gewisse Zeitscheibe</p>
+<p>Kooperativ = Jeder Thread wird solange ausgeführt bis auf eine blockierende Anweisung gestossen wird</p>
+<p>Blockierende Anweisungen:</p>
+<ul>
+<li><p>Thread schlafen legen (delay/sleep)</p></li>
+<li><p>Empfang auf Kanal (potentiell blockierend da Kanal 'leer' sein kann)</p></li>
+<li><p>Senden auf Kanal (potentiell blockierend da Kanal 'voll' sein kann)</p></li>
+</ul>
+<h4 id="zustandsbasierte-ausführung">Zustandsbasierte Ausführung</h4>
+<p>Notation angelehnt an die Ausfuehrung von UPPAAL/kommunizierenden Automaten.</p>
+<ul>
+<li>Der Programzustand besteht aus dem Zustand der einzelnen Threads. Z.B.</li>
+</ul>
+<pre><code>(Main.Running, A.Waiting, B.Waiting)</code></pre>
+<p>beschreibt den Zustand in dem</p>
+<ol style="list-style-type: decimal">
+<li><p>der main Thread ausgefuehrt, und</p></li>
+<li><p>Thread A und B im Wartezustand sind.</p></li>
+</ol>
+<ul>
+<li>Erzeugung eines Threads (via dem <code>go</code> Schluesselwort) fuegt einen neuen Thread hinzu. Initial im Wartezustand.</li>
+</ul>
+<p>Betrachte z.B.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> a() {
+  }
+<span class="kw">func</span> main() {
+ <span class="kw">go</span> a()
+}</code></pre></div>
+<p>Initial ist der Programmzustand wie folgt.</p>
+<pre><code>Main.Running</code></pre>
+<p>Nach Ausfuehrung von <code>go a()</code> befinden wir uns im folgenden Programmzustand.</p>
+<pre><code>(Main.Running, A.Waiting)</code></pre>
+<ul>
+<li>Ein Programmpfad wird beschrieben durch die Abfolge der einzelnen Programmzustaende. Der Fortschritt vom aktuellen auf den Folgezustand wird getrennt durch <code>--&gt;</code>.</li>
+</ul>
+<pre><code>      Main.Running
+
+--&gt;   (Main.Running, A.Waiting)</code></pre>
+<h3 id="beispiel">Beispiel</h3>
+<p>Ausfuehrung obigen Programs. Annahme: Eine CPU verfuegbar.</p>
+<pre><code>    Main.Running
+
+--&gt; (Main.Running, A.Waiting)
+
+--&gt; (Main.Running, A.Waiting, B.Waiting)
+
+--&gt; (Main.Blocked, A.Waiting, B.Waiting)
+</code></pre>
+<ul>
+<li><p>Main Thread blockiert wegen Sleep Anweisung</p></li>
+<li><p>Einer der wartenden Threads bekommt die Kontrolle</p></li>
+<li><p>Annahme: Der am laengsten wartende Thread bekommt Kontrolle</p></li>
+</ul>
+<pre><code>
+...
+
+--&gt; (Main.Blocked, A.Waiting, B.Waiting)
+
+--&gt; (Main.Blocked, A.Running, B.Waiting)
+
+--&gt; (Main.Waiting, A.Blocked, B. Waiting)</code></pre>
+<ul>
+<li><p>A Thread blockiert wegen Sleep Anweisung</p></li>
+<li><p>In der Zwischenzweit, Blockierung von Main Thread aufgehoben, da 'Sleep' Zeit um ist</p></li>
+</ul>
+<pre><code>
+...
+
+--&gt; (Main.Waiting, A.Blocked, B. Waiting)
+
+--&gt; (Main.Waiting, A.Blocked, B.Running)</code></pre>
+<p>usw</p>
+</div>
+<div id="kommunikation-channels" class="slide section level1">
+<h1>Kommunikation (&quot;channels&quot;)</h1>
+<p>Der Nachrichtenaustausch zwischen Threads geschieht mit Hilfe von Kanälen (&quot;channels&quot;). Folgendes Prinzip gilt:</p>
+<ol style="list-style-type: decimal">
+<li><p>Jeder Thread kann Nachrichten senden und empfangen.</p></li>
+<li><p>Eine Nachricht kann von genau einem Thread empfangen werden.</p></li>
+<li><p>Ein Empfänger muss notwendigerweise auf eine Nachricht warten.</p></li>
+<li><p>Ein Sender kann fortfahren, solange der Kanal noch einen einen Puffer (Zwischenspeicher) zur Verfügung hat.</p></li>
+<li><p>Der Puffer ist immer endlich. Im Extremfall hat ein Kanal keine Puffer. Dann kann ein Sender nur fortfahren, falls es einen Empfänger gibt.</p></li>
+</ol>
+<p>Im Detail siehe unten.</p>
+<p><b>Getypte Kanäle</b></p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">var</span> ch <span class="kw">chan</span> <span class="dt">int</span></code></pre></div>
+<p>Wir deklarieren eine Variable <code>ch</code> als einen Kanal. Die Werte die über diesen Kanal ausgetauscht werden sollen, müssen vom Typ Integer sein.</p>
+<p><b>Kanal erzeugen</b></p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)</code></pre></div>
+<p>Ein Kanal muss via <code>make</code> erzeugt werden. Eine Deklaration via <code>var ch chan int</code> liefert nur einen <em>geschlossenen</em> Kanal auf dem keine Operationen ausgefuehrt werden koennen.</p>
+<p><b>Kanal ohne/mit Puffer</b></p>
+<p>In Go gibt es zwei Arten von Kanälen. Ohne Puffer und mit Puffer.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">ch1 = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+
+ch2 = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>, <span class="dv">50</span>)</code></pre></div>
+<p>Kanal ch2 hat Platz für maximal 50 (Puffer)Elemente. Kanal ch1 ist ein Kanal ohne Puffer.</p>
+<p>Folgene Regeln gelten im Falle von Nachrichtenaustasch.</p>
+<ul>
+<li><p>Kanal ohne Puffer (synchrone Kommunikation):</p>
+<ul>
+<li>Ein Empfänger blockiert solange bis ein Sender auftaucht.</li>
+<li>Gleiches gilt für den Sender (da kein Puffer vorhanden ist)</li>
+</ul></li>
+<li><p>Kanal mit Puffer (asynchrone Kommunikation):</p>
+<ul>
+<li>Ein Empfänger blockiert solange bis ein Sender auftaucht.</li>
+<li>Ein Sender blockiert nur falls kein Puffer mehr vorhanden ist.</li>
+<li>Der Puffer verhält sich wie eine Schlange (&quot;FIFO queue&quot;).</li>
+</ul></li>
+</ul>
+<p>Der Unterschied ist also wie folgt. Im Falle eines Kanals ohne Puffer, muss sich eine Sender immer mit einem Empfänger <em>synchronisieren</em>. Falls Puffer vorhanden ist, kann sich der Sender <em>asynchron</em> verhalten, sprich, muss nicht auf einen Empfänger warten.</p>
+<p><b>Senden</b></p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">ch &lt;- y</code></pre></div>
+<p>Sende Wert <code>y</code> an Kanal <code>ch</code></p>
+<p><b>Empfangen</b></p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">x = &lt;- ch</code></pre></div>
+<p>Empfange von Kanal <code>ch</code> und speichere Wert in <code>x</code></p>
+<h2 id="beispiel-1">Beispiel</h2>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">func</span> snd(ch <span class="kw">chan</span> <span class="dt">int</span>) {
+    <span class="kw">var</span> x <span class="dt">int</span> = <span class="dv">0</span>
+    <span class="kw">for</span> {
+        x++
+        ch &lt;- x
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+    }
+
+}
+
+<span class="kw">func</span> rcv(ch <span class="kw">chan</span> <span class="dt">int</span>) {
+    <span class="kw">var</span> x <span class="dt">int</span>
+    <span class="kw">for</span> {
+        x = &lt;-ch
+        fmt.Printf(<span class="st">&quot;received %d </span><span class="ch">\n</span><span class="st">&quot;</span>, x)
+
+    }
+
+}
+
+<span class="kw">func</span> main() {
+    <span class="kw">var</span> ch <span class="kw">chan</span> <span class="dt">int</span> = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">go</span> snd(ch)
+    rcv(ch)
+
+}</code></pre></div>
+<h2 id="beispielhafte-ausführung-zustands-basiert">Beispielhafte Ausführung (Zustands-basiert)</h2>
+<pre><code>    rcv.Running
+
+--&gt; (rcv.Running, snd.Waiting)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Waiting)
+
+     Notation: Im Fall von Blocked beschreibt der &#39;subscript&#39; den Blockierunsgrund
+
+    &lt;-ch?   Empfaenger ist blockiert
+    ch&lt;-1?  Sender ist blockiert
+
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Running)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Blocked_(ch&lt;-1?))
+
+     Erste Thread wartet auf den Empfang einer Nachricht.
+     Zweite Thread versucht eine Nachricht zu versenden.
+
+     Wir sagen beide Threads können sich synchronisieren (es findet eine Art von &quot;hand-shake&quot; statt).
+     Der Nachrichtenaustausch findet statt und die Blockierung wird aufgehoben.
+
+
+--&gt; (rcv.Waiting, snd.Waiting)
+
+--&gt; (rcv.Running, snd.Waiting)
+
+...</code></pre>
+<p>Wir betrachten folgende Variante (1 Empfaenger, 2 Sender).</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> main() {
+    <span class="kw">var</span> ch <span class="kw">chan</span> <span class="dt">int</span> = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">go</span> snd(ch) <span class="co">// snd1</span>
+    <span class="kw">go</span> snd(ch) <span class="co">// snd2</span>
+    rcv(ch)
+
+}</code></pre></div>
+<pre><code>    rcv.Running
+
+--&gt; (rcv.Running, snd1.Waiting)
+
+--&gt; (rcv.Running, snd1.Waiting, snd2.Waiting)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd1.Waiting, snd2.Waiting)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd1.Running, snd2.Waiting)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd1.Blocked_(ch&lt;-1?), snd2.Waiting)
+
+    Mehrere Moeglichkeiten:
+
+    (1) rcv synchronisiert sich mit snd1, oder
+    (2) snd2 Thread laeuft weiter.
+
+    Wie waehlen Moeglichkeit (2)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd1.Blocked_(ch&lt;-1?), snd2.Running)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd1.Blocked_(ch&lt;-1?), snd2.Blocked_(ch&lt;-1?))
+
+    Mehrere Moeglichkeiten:
+
+    (1) rcv synchronisiert sich mit snd1, oder
+    (2) rcv synchronisiert sich mit snd2.
+
+    Wir waehlen Moeglichkeit (1)
+
+    [Hintergrund:
+    Das Go Laufzeitsystem verwaltet blockierende Empfaenger in Sender
+    in einer Schlange (queue), deshalb ist es Moeglichkeit (1)
+    am wahrscheinlichsten.]
+
+--&gt; (rcv.Waiting, snd1.Waiting, snd2.Blocked_(ch&lt;-1?))
+
+...</code></pre>
+<p>Wir betrachten eine weitere Variante (Kanal mit Puffer)</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> main() {
+    <span class="kw">var</span> ch <span class="kw">chan</span> <span class="dt">int</span> = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>, <span class="dv">1</span>) <span class="co">// Kanal mit Puffer</span>
+    <span class="kw">go</span> snd(ch)
+    rcv(ch)
+
+}</code></pre></div>
+<pre><code>    rcv.Running
+
+--&gt; (rcv.Running, snd.Waiting)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Waiting)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Running)
+
+    // Kanalpuffer mit 1 gefuellt
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Blocked_(Sleep(1s)?))
+
+--&gt; (rcv.Waiting, snd.Blocked_(Sleep(1s)?))
+
+    // Kanal wieder leer
+
+--&gt; (rcv.Running, snd.Blocked_(Sleep(1s)?))
+
+...</code></pre>
+<p>Als weitere Variante. Kanal mit Puffer 1 und snd ohne Sleep.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> snd(ch <span class="kw">chan</span> <span class="dt">int</span>) {
+    <span class="kw">var</span> x <span class="dt">int</span> = <span class="dv">0</span>
+    <span class="kw">for</span> {
+        x++
+        ch &lt;- x
+    }
+
+}</code></pre></div>
+<pre><code>    rcv.Running
+
+--&gt; (rcv.Running, snd.Waiting)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Waiting)
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Running)
+
+    // Kanalpuffer mit 1 gefuellt
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Blocked_(ch&lt;-2?))
+
+     // Zwei Moeglichkeiten
+     // (a) rcv liest aus Kanal, oder
+     // (b) direkt von snd
+     //
+     // (a) ist die Variante die vom
+     // Go Laufzeitsystem gewaehlt wird
+
+--&gt; (rcv.Running, snd.Blocked_(ch&lt;-2?))
+
+     // Kanal wieder leer
+
+--&gt; (rcv.Blocked_(&lt;-ch?), snd.Blocked_(ch&lt;-2?))
+
+     // Wiederum zwei Moeglichkeiten
+     // (a) snd schreibt in Kanal, oder
+     // (b) uebergibt Wert direkt an rcv
+     //
+     // (a) ist die wahrscheinlichste Variante
+</code></pre>
+<ul>
+<li><p>Im Falle von 'Sleep' wird die Ausfuehrung oft chaotisch (keine Garantie, dass nach exakt einer Sekunde der Thread wieder aufwacht)</p></li>
+<li><p>Im Fall eines Kanals mit Puffer ist das Senden nicht blockierend (falls noch genuegend Platz vorhanden).</p></li>
+<li><p>Im Fall von Kanaelen ohne Puffer ist das Vorhalten meistens vorhersehbarer, da der Sender sich immer mit einem Empfaenger synchronisieren muss.</p></li>
+</ul>
+<h2 id="eingeschränkte-kommunikation">Eingeschränkte Kommunikation</h2>
+<p>Funktionsprototypen können mit Annotationen versehen werden.</p>
+<p>Nur Senden</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> snd(ch <span class="kw">chan</span> &lt;- <span class="dt">int</span>) { 
+ ...
+}</code></pre></div>
+<p>Nur Empfangen</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> rcv(ch &lt;- <span class="kw">chan</span> <span class="dt">int</span>) { 
+ ...
+}</code></pre></div>
+</div>
+<div id="kanäle-von-kanälen-channels-of-channels" class="slide section level1">
+<h1>Kanäle von Kanälen (&quot;channels of channels&quot;)</h1>
+<p>Kanäle sind Werte (&quot;first-class citizens&quot;)</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="st">`var ch chan (chan int)`</span></code></pre></div>
+<p>Kanal der als Werte Kanäle von Integern enthält</p>
+<p>Erlaubt komplexe simultane Programmiermuster</p>
+<h2 id="beispiel-2">Beispiel</h2>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">type</span> Request <span class="kw">struct</span> {
+    id  <span class="dt">int</span>
+    ack <span class="kw">chan</span> <span class="dt">int</span>
+}</code></pre></div>
+<p>Eine Anfrage besteht aus einer Identifikationsnummer und einem Kanal via dem wir die erfolgreiche Bearbeitung signalisieren.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> worker(req <span class="kw">chan</span> Request) {
+    <span class="kw">var</span> c Request
+    <span class="kw">for</span> {
+        c = &lt;-req
+        fmt.Printf(<span class="st">&quot;request received from %d </span><span class="ch">\n</span><span class="st">&quot;</span>, c.id)
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+        fmt.Println(<span class="st">&quot;notify&quot;</span>)
+        c.ack &lt;- <span class="dv">1</span>
+    }
+}</code></pre></div>
+<p>Der Arbeiter wartet auf Anfragen. Nach Abarbeitung jeder Anfrage wird der Kunde via dem <code>ack</code> Kanal benachrichtigt.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> client(id <span class="dt">int</span>, req <span class="kw">chan</span> Request) {
+    <span class="kw">var</span> ack = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">for</span> {
+        c := Request{id, ack}
+        req &lt;- c
+        &lt;-ack
+    }
+
+}</code></pre></div>
+<p>Der Kunde schickt Anfrage und wartet via dem <code>ack</code> Kanal auf die erfolgreiche Bearbeitung.</p>
+<p>Hier ist eine Beispielhafe Ausführung.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> main() {
+    <span class="kw">var</span> req = <span class="fu">make</span>(<span class="kw">chan</span> Request)
+    <span class="kw">go</span> worker(req)
+    <span class="kw">go</span> client(<span class="dv">1</span>, req)
+    client(<span class="dv">2</span>, req)
+}</code></pre></div>
+<h2 id="sleeping-barber">Sleeping barber</h2>
+<p>Beschreibung: Es gibt einen Barbier und mehrere Kunden. Jeder Kunde möchte sich die Haare schneiden lassen, falls der Barbier verfügbar ist. Der Kunde muss warten falls ein anderer Kunde gerade einen Haarschnitt bekommt.</p>
+<p>Unten folgt eine mögliche Implementierung in Go.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">const</span> (
+    NUMBER_OF_CHAIRS = <span class="dv">8</span>
+)
+
+<span class="kw">type</span> Request <span class="kw">struct</span> {
+    id  <span class="dt">int</span>
+    ack <span class="kw">chan</span> <span class="dt">int</span>
+}
+
+<span class="kw">func</span> barber(waitQ (<span class="kw">chan</span> Request)) {
+
+    <span class="kw">for</span> {
+        req := &lt;-waitQ
+        fmt.Printf(<span class="st">&quot;BARBER: Serving customer %d </span><span class="ch">\n</span><span class="st">&quot;</span>, req.id)
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+        fmt.Printf(<span class="st">&quot;BARBER: Done with customer %d </span><span class="ch">\n</span><span class="st">&quot;</span>, req.id)
+        req.ack &lt;- <span class="dv">1</span>
+
+    } <span class="co">// for</span>
+
+} <span class="co">// barber</span>
+
+<span class="kw">func</span> customer(waitQ (<span class="kw">chan</span> Request), id <span class="dt">int</span>) {
+    <span class="kw">var</span> ack = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">for</span> {
+
+        fmt.Printf(<span class="st">&quot;CUSTOMER: %d wants hair cut </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+        req := Request{id, ack}
+        waitQ &lt;- req
+        fmt.Printf(<span class="st">&quot;CUSTOMER: %d sits on chair </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+        &lt;-ack
+        fmt.Printf(<span class="st">&quot;CUSTOMER: %d served by barber </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+
+    } <span class="co">// for</span>
+
+} <span class="co">// customer</span>
+
+<span class="kw">func</span> main() {
+
+    <span class="kw">var</span> (
+        waitQ = <span class="fu">make</span>(<span class="kw">chan</span> Request, NUMBER_OF_CHAIRS)
+    )
+
+    <span class="kw">go</span> customer(waitQ, <span class="dv">1</span>)
+    <span class="kw">go</span> customer(waitQ, <span class="dv">2</span>)
+    barber(waitQ)
+
+}</code></pre></div>
+<p>Beachte:</p>
+<ul>
+<li>Wir verwenden einen Kanal mit Puffer um das Warten auf einem Stuhl zu modellieren</li>
+<li>Falls noch Stühle vorhanden sind (sprich noch Platz im Puffer), dann kann der Kunde noch was sinnvolles machen (Zeitung lesen etc) bis er an die Reihe kommt</li>
+<li>Ansonsten, wird der Kunde blockiert beim Absenden des Requests (würde bedeuten der Barbierladen ist voll, und er muss draussen warten)</li>
+<li>In obiger Modellierung, ist das Haareschneiden und die Bestätigung miteinander vermischt (könnte man noch trennen, wenn man will)</li>
+</ul>
+<h2 id="aufgabe-publishsubscribe">Aufgabe: Publish/Subscribe</h2>
+<p>Ihre Aufgabe ist die Implementierung eines Publish/Subscribe Servers und mehrer Beispiel Clients. Als Vorgabe können Sie das &quot;channels of channels&quot; Beispiel aus der Vorlesung verwenden. Folgende Veränderungen sollten Sie vornehmen.</p>
+<p>Anstatt eines Request Kanals gibt es je einen Publish und Subscribe Kanal. Der Server empfängt auf beiden Kanälen und leitet &quot;Publish&quot; Nachrichten an die entsprechenden registrierten Clients weiter.</p>
+<p>Es gibt es zwei Arten von Clients. Publish Clients und Subscribe Clients.</p>
+<p>Beachte: Falls der Server sämtliche Clients in einem Thread abhandelt, könnte der Server blockieren falls Subscribe Clients aufhören Nachrichten zu lesen. Wie könnte diese Problem gelöst werden?</p>
+<h3 id="wir-versuchen-es-mal">Wir versuchen es mal</h3>
+<p>Im folgenden entwickeln wir inkrementell eine Lösung (unten nochmal komplett).</p>
+<p>Zuerst mal ein paar notwendige Datenstrukturen</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">type</span> Message <span class="kw">struct</span> {
+    topic <span class="dt">string</span>
+    body  <span class="dt">string</span>
+}</code></pre></div>
+<p>Jede Nachricht (message) besteht aus einem &quot;topic&quot; und &quot;body&quot;.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">type</span> Sub <span class="kw">struct</span> {
+    topic <span class="dt">string</span>
+    news  <span class="kw">chan</span> Message
+}</code></pre></div>
+<p>Jeder Subscriber registriert ein &quot;topic&quot; und einen &quot;news&quot; Kanal via dem Nachrichten zu dem entsprechenden &quot;topic&quot; erhalten werden können.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">type</span> Server <span class="kw">struct</span> {
+    csub <span class="kw">chan</span> Sub
+    cpub <span class="kw">chan</span> Message
+}</code></pre></div>
+<p>Der Server verwaltet zwei Kanäle. Ein Kanal (csub) über den sich Subscriber registrieren können und ein Kanal (cpub) über den ein Publizierer Nachrichten schickt.</p>
+<h3 id="subscriber-und-publizierer">Subscriber und Publizierer</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> subscriber(server Server, t <span class="dt">string</span>) {
+    s := Sub{topic: t, news: <span class="fu">make</span>(<span class="kw">chan</span> Message)}
+    server.csub &lt;- s
+
+    <span class="kw">for</span> {
+        msg := &lt;-s.news
+        fmt.Printf(<span class="st">&quot;topic %s: </span><span class="ch">\n</span><span class="st"> message %s </span><span class="ch">\n</span><span class="st">&quot;</span>, t, msg.body)
+
+    }
+
+}</code></pre></div>
+<p>Ein Subscriber registriert sich und wartet auf Nachrichten.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> slashdot(server Server) {
+    <span class="kw">for</span> {
+        m := Message{topic: <span class="st">&quot;slashdot&quot;</span>, body: <span class="st">&quot;some news&quot;</span>}
+        server.cpub &lt;- m
+        time.Sleep(<span class="dv">2</span> * <span class="fl">1e9</span>)
+
+    }
+
+}</code></pre></div>
+<p>Ein Publizierer (hier &quot;slashdot&quot;) verschickt Nachrichten über den entsprechenden Kanal.</p>
+<h3 id="server">Server</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> pubSubServer(server Server) {
+    subscribers := list.New()
+
+    <span class="kw">for</span> {
+
+        <span class="kw">select</span> {
+        <span class="kw">case</span> s := &lt;-server.csub:
+            subscribers.PushBack(s)
+        <span class="kw">case</span> m := &lt;-server.cpub:
+            <span class="kw">for</span> e := subscribers.Front(); e != <span class="ot">nil</span>; e = e.Next() {
+                s := (e.Value).(Sub) <span class="co">// type assertion</span>
+                <span class="kw">if</span> s.topic == m.topic {
+                    s.news &lt;- m                          <span class="co">// (B)</span>
+                }
+            }
+
+        }
+
+    }
+
+}</code></pre></div>
+<p>Der Server verwaltet die Liste von Subscribern. Er horcht gleichzeitig (via <code>select</code>) auf den jeweiligen Kanälen für Subscriber und Publizierer. Ein Subscriber wird einfach zur Liste hinzugefügt. Eine Nachricht eines Publizierers wird an den dafür sich registrierten Subscriber geschickt.</p>
+<h3 id="blockierung-des-servers">Blockierung des Servers</h3>
+<p>Nun zur obigen Problemstellung. Falls der Server sämtliche Clients in einem Thread abhandelt, könnte der Server blockieren falls Subscribe Clients aufhören Nachrichten zu lesen. Wieso?</p>
+<p>Man betrachte die mit (B) markierte Programmstelle. Falls ein Subscriber die Nachricht nicht abholt, wird der Server an dieser Stelle blockieren. Was wären aushilfen?</p>
+<ol style="list-style-type: decimal">
+<li><p>Der &quot;news&quot; Kanals des Subscribers hat einen Puffer. Was ist aber falls der Puffer voll läuft?</p></li>
+<li><p>Wir legen für jeden Subscriber einen eigenen Thread an. Dieser Thread verarbeitet alle für den Subscriber bestimmte Nachrichten. Sprich, wir schicken die Nachricht nicht direkt an den Subscriber, sondern zuerst an diesen Hilfsthread. Dieser Hilfsthread garantiert alle Nachrichten zu verarbeiten und darf natürlich nicht blockieren. Falls der Puffer voll läuft, könnte man</p>
+<ol style="list-style-type: lower-alpha">
+<li>Nachrichten verwerfen, oder</li>
+<li>einen dynamisch wachsenden internen Puffer anlegen.</li>
+</ol></li>
+<li><p>Es gibt noch eine einfachere Möglichkeit. Ersetze die Programmstelle (B) durch</p></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">                    <span class="kw">go</span> <span class="kw">func</span>() { s.news &lt;- m }()</code></pre></div>
+<p>Publizieren der Nachricht geschickt asynchron. Dadurch modellieren wir effektiv einen Kanal mit unendlicher Puffergröße (nur durch den vorhandenen Speicher begrenzt).</p>
+<h3 id="komplette-lösung">Komplette Lösung</h3>
+<ul>
+<li>Wir bauen die zusätzliche Variante ein, dass eine Nachricht verworfen wird, falls die Nachricht nicht innerhalb einer Zeitschranke abgeholt wird</li>
+<li>Wir verwenden ein paar GoLang Bibliotheken, z.B. Umwandlung von Integer nach String, Listen etc.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="co">// publish, subscribe example</span>
+<span class="co">// adopted from Russ Cox</span>
+
+<span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;strconv&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;container/list&quot;</span>
+
+<span class="kw">type</span> Message <span class="kw">struct</span> {
+    topic <span class="dt">string</span>
+    body  <span class="dt">string</span>
+}
+
+<span class="kw">type</span> Sub <span class="kw">struct</span> {
+    topic <span class="dt">string</span>
+    news  <span class="kw">chan</span> Message
+}
+
+<span class="kw">type</span> Server <span class="kw">struct</span> {
+    csub <span class="kw">chan</span> Sub
+    cpub <span class="kw">chan</span> Message
+}
+
+<span class="kw">func</span> subscriber(server Server, t <span class="dt">string</span>) {
+    s := Sub{topic: t, news: <span class="fu">make</span>(<span class="kw">chan</span> Message)}
+    server.csub &lt;- s
+
+    <span class="kw">for</span> {
+        msg := &lt;-s.news
+        fmt.Printf(<span class="st">&quot;topic %s: </span><span class="ch">\n</span><span class="st"> message %s </span><span class="ch">\n</span><span class="st">&quot;</span>, t, msg.body)
+
+    }
+
+}
+
+<span class="kw">func</span> pubSubServer(server Server) {
+    subscribers := list.New()
+
+    <span class="kw">for</span> {
+
+        <span class="kw">select</span> {
+        <span class="kw">case</span> s := &lt;-server.csub:
+            subscribers.PushBack(s)
+        <span class="kw">case</span> m := &lt;-server.cpub:
+            <span class="kw">for</span> e := subscribers.Front(); e != <span class="ot">nil</span>; e = e.Next() {
+                s := (e.Value).(Sub) <span class="co">// type assertion</span>
+                <span class="kw">if</span> s.topic == m.topic {
+                    <span class="co">// s.news &lt;- m</span>
+
+                    <span class="co">// avoid blocking by publishing asynchronously</span>
+                    <span class="co">// go func() { s.news &lt;- m }()</span>
+
+                    <span class="co">// avoid blocking, throw away msg if not picked up after 1sec</span>
+                    <span class="kw">go</span> <span class="kw">func</span>() {
+                        <span class="kw">select</span> {
+                        <span class="kw">case</span> s.news &lt;- m:
+                        <span class="kw">case</span> &lt;-time.After(<span class="dv">1</span> * <span class="fl">1e9</span>):
+                        }
+                    }()
+
+                }
+            }
+
+        }
+
+    }
+
+}
+
+<span class="kw">func</span> slashdot(server Server) {
+    <span class="kw">for</span> {
+        m := Message{topic: <span class="st">&quot;slashdot&quot;</span>, body: <span class="st">&quot;some news&quot;</span>}
+        server.cpub &lt;- m
+        time.Sleep(<span class="dv">2</span> * <span class="fl">1e9</span>)
+
+    }
+
+}
+
+<span class="kw">func</span> reuters(server Server) {
+    i := <span class="dv">0</span>
+    <span class="kw">for</span> {
+        s := strconv.Itoa(i)
+        <span class="co">// string(i) won&#39;t give us the desired effect</span>
+        m := Message{topic: <span class="st">&quot;reuters&quot;</span>, body: <span class="st">&quot;some news &quot;</span> + s}
+        server.cpub &lt;- m
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+        i++
+
+    }
+
+}
+
+<span class="kw">func</span> main() {
+    server := Server{csub: <span class="fu">make</span>(<span class="kw">chan</span> Sub), cpub: <span class="fu">make</span>(<span class="kw">chan</span> Message)}
+
+    <span class="kw">go</span> pubSubServer(server)
+    <span class="kw">go</span> subscriber(server, <span class="st">&quot;slashdot&quot;</span>)
+    <span class="kw">go</span> subscriber(server, <span class="st">&quot;reuters&quot;</span>)
+
+    <span class="kw">go</span> slashdot(server)
+    reuters(server)
+}</code></pre></div>
+</div>
+<div id="synchrone-versus-asynchrone-kommunikation" class="slide section level1">
+<h1>Synchrone versus Asynchrone Kommunikation</h1>
+<p>Zur Wiederholung.</p>
+<ul>
+<li>Kanal ohne Puffer (synchrone Kommunikation)
+<ul>
+<li>Sender blockiert falls kein Empfänger vorhanden</li>
+<li>Empfänger blockiert falls kein Sender vorhanden</li>
+</ul></li>
+<li>Kanal mit Puffer (asynchrone Kommunikation)
+<ul>
+<li>Sender blockiert falls Puffer voll</li>
+<li>Empfänger blockiert falls Puffer leer</li>
+</ul></li>
+</ul>
+<p>Wir zeigen, dass beide Kommunikationsarten gleichmächtig sind. D.h. ein Kanal mit Puffer kann durch Kanäle ohne Puffer emuliert werden. Dies zeigen wir durch eine Reihe von Aufgaben.</p>
+<h2 id="aufgabe-mutex">Aufgabe: Mutex</h2>
+<p>Go unterstützt die bekannten Synchronisationsprimitive via Mutex etc. Siehe <a href="sync">http://golang.org/pkg/sync/</a>. Jedoch können wir uns recht einfach einen Mutex mit Hilfe von Kanälen selber bauen (Die nativen Mutexe in Go sind sicherlich effzienter implementiert, aber hier geht es nur um das Prinzip).</p>
+<ul>
+<li>Idee: Mutex ist repräsentiert als Kanal mit einem Pufferelement.</li>
+<li>Der Puffer ist initial leer.</li>
+<li><code>lock</code> sendet und <code>unlock</code> empfängt.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">type</span> Mutex (<span class="kw">chan</span> <span class="dt">int</span>)
+
+<span class="kw">func</span> newMutex() Mutex {
+    <span class="kw">var</span> ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>, <span class="dv">1</span>)
+    <span class="kw">return</span> ch
+}
+
+<span class="kw">func</span> lock(m Mutex) {
+    m &lt;- <span class="dv">1</span>
+}
+
+<span class="kw">func</span> unlock(m Mutex) {
+    &lt;-m
+}</code></pre></div>
+<p>Obige Implementierung basiert auf einen Kanal mit Puffer der Grösse 1. Es geht auch ohne Puffer wie wir gleich sehen werden.</p>
+<h2 id="aufgabe-mutierbare-variable">Aufgabe: Mutierbare Variable</h2>
+<p>Implementieren sie eine mutierbare Variable, die durch folgende Schnittstelle beschrieben ist.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">type</span> MVar (<span class="kw">chan</span> <span class="dt">int</span>)
+<span class="kw">func</span> newMVar(x <span class="dt">int</span>) MVar
+<span class="kw">func</span> takeMVar(m MVar) <span class="dt">int</span>
+<span class="kw">func</span> putMVar(m MVar, x <span class="dt">int</span>)</code></pre></div>
+<ul>
+<li>Eine MVar ist entweder voll oder leer</li>
+<li>Initial ist eine MVar mit einem Integer Wert gefüllt</li>
+<li><code>takeMVar</code>
+<ul>
+<li>lesen des Wertes falls voll</li>
+<li>blockiert ansonsten</li>
+</ul></li>
+<li><code>putMVar</code>
+<ul>
+<li>schreiben eines Wertes falls leer</li>
+<li>blockiert ansonsten</li>
+</ul></li>
+<li>Hinweise
+<ul>
+<li><code>takeMVar</code> entspricht Empfangen</li>
+<li><code>putMVar</code> entspricht Senden</li>
+<li><code>chan int</code> ist eine synchrone Operation</li>
+<li>Initial ist eine MVar voll, deshalb sollte <code>takeMVar</code> initial nicht blockieren</li>
+<li>Implementierung trivial falls wir einen Kanal mit einem Puffer der Größe 1 verwenden.</li>
+<li>Ziel hier, verwenden Sie einen rein synchronen Kanal ohne Puffer</li>
+</ul></li>
+</ul>
+<p>Mit Hilfe einer MVar können wir ganz einfach einen Mutex emulieren.</p>
+<ul>
+<li><p>newMutx = newMVar mit einem Dummy Element.</p></li>
+<li><p>lock = takeMVar</p></li>
+<li><p>unlock = putMVar eines Dummy Elements.</p></li>
+</ul>
+<h3 id="mvar-beispiel-komplett">MVar Beispiel komplett</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">type</span> MVar (<span class="kw">chan</span> <span class="dt">int</span>)
+
+<span class="kw">func</span> newMVar(x <span class="dt">int</span>) MVar {
+    <span class="kw">var</span> ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">go</span> <span class="kw">func</span>() { ch &lt;- x }()
+    <span class="kw">return</span> ch
+}</code></pre></div>
+<p>Der Trick ist:</p>
+<ul>
+<li>Wir kreieren einen synchronen Kanal <code>ch</code></li>
+<li>In einem nebenläufigen Thread füllen wir den Kanal mit dem initalen Element. Der Thread blockiert zwar, dadurch aber garantieren wir, das initial die MVar voll ist.</li>
+<li>Da die Blockierung nur im nebenläufigen Thread stattfindet. Kann der Kanal <code>ch</code> wird als Wert zurückgegeben</li>
+</ul>
+<p>Die weiteren MVar Primitive können direkt auf die Kanal Operationen Senden/Empfangen abgebildet werden.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> takeMVar(m MVar) <span class="dt">int</span> {
+    <span class="kw">var</span> x <span class="dt">int</span>
+    x = &lt;-m
+    <span class="kw">return</span> x
+}
+
+<span class="kw">func</span> putMVar(m MVar, x <span class="dt">int</span>) {
+    m &lt;- x
+}</code></pre></div>
+<p>Beachte: Folgt direkt nach <code>newMVar</code> ein <code>putMVar</code> ist es theoretisch möglich, dass die <code>newMVar</code> Sendeoperation im nebenläufigen Thread von der <code>putMVar</code> Sendeoperation überhohlt wird.</p>
+<p>Es folgt noch eine Beispielanwendung einer MVar.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> producer(m MVar) {
+    <span class="kw">var</span> x <span class="dt">int</span> = <span class="dv">1</span>
+    <span class="kw">for</span> {
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+        putMVar(m, x)
+        x++
+    }
+}
+
+<span class="kw">func</span> consumer(m MVar) {
+    <span class="kw">for</span> {
+        <span class="kw">var</span> x <span class="dt">int</span> = takeMVar(m)
+        fmt.Printf(<span class="st">&quot;Received %d </span><span class="ch">\n</span><span class="st">&quot;</span>, x)
+    }
+}
+
+<span class="kw">func</span> main() {
+    <span class="kw">var</span> m MVar
+
+    m = newMVar(<span class="dv">1</span>)
+
+    <span class="kw">go</span> producer(m)
+
+    consumer(m)
+
+} <span class="co">// main</span></code></pre></div>
+<h3 id="kodierungs-problem">Kodierungs Problem</h3>
+<p>Obige MVar Implementierung hat ein Problem falls es eine Abfolge von hintereinander ausgeführten <code>takeMVar</code> und <code>putMvar</code> Befehlen gibt. Betrachte</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">    <span class="kw">var</span> m MVar
+    m = newMVar(<span class="dv">1</span>)   <span class="co">// Full</span>
+    takeMVar(m)      <span class="co">// Empty</span>
+    putMVar(m, <span class="dv">2</span>)    <span class="co">// Full</span></code></pre></div>
+<p>In Klammern sind die Zustände der MVar beschrieben. Laut MVar Beschreibung sollte obige Programmabfolge durchlaufen, die Ausführung bleibt aber stecken. Wieso?</p>
+<ul>
+<li>Das erstmalige Füllen der MVar in <code>newMVar</code> geschieht asynchron</li>
+<li>Alle weiteren <code>putMvar</code> Operationen laufen aber synchron ab!</li>
+</ul>
+<p>Eine Lösung: Nebenläufiger Thread der den Zustand der MVar kontrolliert.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">const</span> (
+    Empty = <span class="dv">0</span>
+    Full  = <span class="dv">1</span>
+)
+
+<span class="kw">func</span> newMVar(x <span class="dt">int</span>) MVar {
+    <span class="kw">var</span> ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        <span class="kw">var</span> state = Full
+        <span class="kw">var</span> elem <span class="dt">int</span> = x
+        <span class="kw">for</span> {
+            <span class="kw">switch</span> {
+            <span class="kw">case</span> state == Full:
+                ch &lt;- elem
+                state = Empty
+            <span class="kw">case</span> state == Empty:
+                elem = &lt;-ch
+                state = Full
+            }
+        }
+    }()
+    <span class="kw">return</span> ch
+}</code></pre></div>
+<p>Beachte:</p>
+<ul>
+<li><code>takeMvar</code> und <code>putMVar</code> können sich auch direkt synchronisieren, ohne Synchronisation via dem nebenläufigen Thread in <code>newMVar</code>.</li>
+<li>Im Falle einer direkten Synchronisation bleibt der MVar Zustand (korrekterweise) natürlich invariant.</li>
+</ul>
+<h2 id="aufgabe-quantifizierter-semaphor">Aufgabe: Quantifizierter Semaphor</h2>
+<p>Zu guter Letzt betrachten wir eine Implementierung eines Kanal mit Puffer basierend rein auf Pufferlosen Kanälen.</p>
+<p>Als Vereinfachung betrachten wir einen quantifizierter Semaphor. Sprich wir ignorieren die eigentlichen Nachrichten. Folgende Schnittstelle ist vorgegeben.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">type</span> QSem
+<span class="kw">func</span> newQSem(q <span class="dt">int</span>) QSem
+<span class="kw">func</span> wait(QSem)
+<span class="kw">func</span> signal(QSem)</code></pre></div>
+<p>Beachte, <code>QSem</code> muss geeignet definiert werden. In Ihrer Implementierung sollten Sie nur ``einfache'' nicht gepufferte Kanäle verwenden (ansonsten ist die Aufgabenstellung trivial).</p>
+<p>Initial wird die Quantität durch <code>newQSem</code> gesetzt. Funktion <code>wait</code> erniedrigt die Quantität und blockiert falls Quantität gleich Null ist. Funktion <code>signal</code> erhöht die Quantität und blockiert falls Quantität gleich der initial gesetzten Quantität wird. Ein blockierter <code>wait</code> Aufruf wird durch <code>signal</code> wieder freigegeben.</p>
+<p>Wir betrachten ein Beispiel mit 4 simultan ausgeführten Threads. Zwei Threads führen <code>wait</code> aus, die anderen zwei <code>signal</code>. Wir nehmen an die Quantiät ist maximal 1, wobei am Anfang die aktuelle Quantität schon auf 1 ist.</p>
+<h3 id="notation">Notation</h3>
+<ul>
+<li>R = Run - Thread läuft</li>
+<li>D = Done - Thread fertig</li>
+<li>B = Blocked - Thread blockiert</li>
+<li>Ui = Unblock Thread i - Thread i wird von blockiert auf wartend gestellt.</li>
+</ul>
+<h3 id="beispielausführung">Beispielausführung</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Quantität</th>
+<th align="left">Thread 1</th>
+<th align="left">Thread 2</th>
+<th align="left">Thread 3</th>
+<th align="left">Thread 4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">wait</td>
+<td align="left">wait</td>
+<td align="left">signal</td>
+<td align="left">signal</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">R</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">D</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">R</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">B</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">R</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">U2</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">D</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">D</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">R</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left">D</td>
+</tr>
+</tbody>
+</table>
+<h3 id="erklärung">Erklärung</h3>
+<ul>
+<li>Thread 1 läuft, <code>wait</code> dekrementiert Quantität.</li>
+<li>Thread 2 läuft und blockiert da Quantität nicht unter 0 dekrementiert werden kann.</li>
+<li>Thread 3 läuft.
+<ul>
+<li>Da es einen blockierten <code>wait</code> Thread gibt wird diesem signalisiert er darf fortfahren.</li>
+<li>Sprich der Zustand von Thread 2 wechselt von blockiert auf wartend.</li>
+<li>Thread 3 ist immer noch an der Reihe und terminiert.</li>
+</ul></li>
+<li>Thread 2 kommt jetzt wieder an die Reihe.
+<ul>
+<li>Beachte, Quantität ist 0, da sich <code>wait</code> in Thread 2 und <code>signal</code> in Thread 3 gegenseitig aufheben.</li>
+</ul></li>
+<li>Thread 4 kommt an die Reihe und erhöht die Quantität auf 1.</li>
+</ul>
+<h3 id="hilfestellung-und-kommentare">Hilfestellung und Kommentare</h3>
+<p>Der Zugriff auf die in  gespeicherte aktuelle Quantität muss geschützt. Um den gegenseiten Ausschluss bei gleichzeitig ablaufenden  und  Aufrufen zu garantieren sollten Sie einen Mutex verwenden (siehe oben).</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">type</span> Mutex (<span class="kw">chan</span> <span class="dt">int</span>)
+<span class="kw">type</span> QSem <span class="kw">struct</span> {
+   q    <span class="dt">int</span>     <span class="co">// max quantity</span>
+   curr <span class="dt">int</span>     <span class="co">// current quantity</span>
+   m    Mutex   <span class="co">// guarantee mutually exclusive access</span>
+}</code></pre></div>
+<h3 id="eine-erster-implementierungsansatz">Eine erster Implementierungsansatz</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> newQSem(q <span class="dt">int</span>) QSem {
+    <span class="kw">var</span> m = newMutex()
+    qsem := QSem{q, q, m}
+
+    <span class="kw">return</span> qsem
+}
+
+<span class="kw">func</span> wait(qsem *QSem) {
+    lock(qsem.m)
+        qsem.curr--
+        unlock(qsem.m)
+}
+
+<span class="kw">func</span> signal(qsem *QSem) {
+    lock(qsem.m)
+        qsem.curr++
+        unlock(qsem.m)
+}</code></pre></div>
+<ul>
+<li><p>Funktion <code>wait</code> dekrementiert und Funktion <code>signal</code> inkrementiert die aktuelle Quantität. Der Zugriff auf <code>qsem.curr</code> ist geschützt durch den Mutex.</p></li>
+<li><p>Beachte: <code>QSem</code> wird als Zeiger übergeben, da ja die Dekrementierung/Inkrementierung auch nach aussen sichtbar sein soll. [In C/C++ müßte man <code>qsem-&gt;curr</code> schreiben was nicht notwendig ist in Go]</p></li>
+</ul>
+<p>Obiges ist sicherlich nur eine partielle Lösung. Z.B. in <code>wait</code> sollte der Wert <code>qsem.curr</code> nur dann dekrementiert werden wenn größer als Null.</p>
+<p>Was soll passieren falls <code>qsem.curr</code> gleich Null ist? Dann blockiert <code>wait</code> solange bis via einem <code>signal</code> Aufruf <code>qsem.curr</code> wieder größer als Null ist.</p>
+<p>Was soll passieren falls es mehrere blockierte <code>wait</code>s gibt? Dann wähle den am längsten wartenden (garantiert `<code>fairness''). Beachte. Zu jedem Zeitpunkt soll immer nur ein blockierter</code>wait` wieder fortfahren dürfen.</p>
+<p>Analoges Vorgehen für <code>signal</code>.</p>
+<h3 id="weitere-verfeinerung">Weitere Verfeinerung</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> wait(qsem *QSem) {
+    lock(qsem.m)
+        <span class="kw">if</span> qsem.curr &gt; <span class="dv">0</span> {
+           qsem.curr--
+           <span class="co">// check for any blocked signal call</span>
+           <span class="co">// if any, pick the &#39;first&#39; and unblock</span>
+           unlock(qsem.m)
+        } <span class="kw">else</span> {
+          <span class="co">// wait until unblocked by signal call</span>
+        }
+}
+
+<span class="kw">func</span> signal(qsem *QSem) {
+    lock(qsem.m)
+    <span class="kw">if</span> qsem.curr &lt; qsem.q {
+           qsem.curr++
+           <span class="co">// check for any blocked wait call</span>
+           <span class="co">// if any, pick the &#39;first&#39; and unblock</span>
+           unlock(qsem.m)
+        } <span class="kw">else</span> {
+          <span class="co">// wait until unblocked by wait call</span>
+        }        
+}</code></pre></div>
+<p>Wie verwalten wir die blockierten <code>wait</code>s/<code>signal</code>s? Am besten in einer dynamisch wachsenden Liste, die wir als Schlange (<code>queue'') benutzen (siehe</code>fairness'').</p>
+<p>Wie informieren wir blockierte <code>wait</code>s/<code>signal</code>s, dass sie fortfahren dürfen? Wir missbrauchen unseren Mutex. Ein blockierter <code>wait</code>/<code>signal</code> führt <code>unlock'' aus. Der Thread der den blockierten Thread wieder fortfahren läßt führt</code>lock'' aus.</p>
+<h3 id="warteliste-für-blockierte-waitssignals">Warteliste für blockierte <code>wait</code>s/<code>signal</code>s</h3>
+<p>Hier das endgültige Grundgerüst.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">import</span> <span class="st">&quot;container/list&quot;</span>
+
+<span class="kw">type</span> QSem <span class="kw">struct</span> {
+    q              <span class="dt">int</span>
+    curr           <span class="dt">int</span>
+    m              Mutex
+    blockedWaits   *list.List
+    blockedSignals *list.List
+}
+
+<span class="kw">func</span> newQSem(q <span class="dt">int</span>) QSem {
+    <span class="kw">var</span> m = newMutex()
+    qsem := QSem{q, q, m, list.New(), list.New()}
+
+    <span class="kw">return</span> qsem
+}</code></pre></div>
+<p>Informationen zu Listen in Go finden Sie hier: <a href="list">http://golang.org/pkg/container/list/</a></p>
+<p>Zu beachten ist, dass Listen in Go heterogen sind. Sprich falls Sie ein Element aus der Liste holen, müssen Sie das Element explizit auf den erwarteten Typ casten.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">   <span class="kw">var</span> s = qsem.blockedSignals.Front()
+   qsem.blockedSignals.Remove(s)
+   lock(s.Value.(Mutex))</code></pre></div>
+<p>Obiges Codefragment holt sich das erste Element aus der Liste und löscht dieses auch. Da wir erwarten, dass Listenelemente Mutexe sind führen wir den cast <code>s.Value.(Mutex)</code> durch. Der Aufruf <code>lock(s.Value.(Mutex))</code> erlaubt es einem blockierten <code>signal</code> fortzufahren.</p>
+<h3 id="kompletter-source-code-der-lösung">Kompletter Source Code der Lösung</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;container/list&quot;</span>
+
+<span class="co">// BEACHTE:</span>
+<span class="co">// Der Einfachheithalber benutzen wir einen Mutex basieren auf Kanal mit Puffer 1.</span>
+<span class="co">// Wie oben beschrieben, kann solch ein Mutex auch mit einem Pufferlosen Kanal implementiert werden.</span>
+<span class="kw">type</span> Mutex (<span class="kw">chan</span> <span class="dt">int</span>)
+
+<span class="kw">func</span> newMutex() Mutex {
+    <span class="kw">var</span> ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>, <span class="dv">1</span>)
+    <span class="kw">return</span> ch
+}
+
+<span class="kw">func</span> lock(m Mutex) {
+    m &lt;- <span class="dv">1</span>
+}
+
+<span class="kw">func</span> unlock(m Mutex) {
+    &lt;-m
+}
+
+<span class="kw">type</span> QSem <span class="kw">struct</span> {
+    q              <span class="dt">int</span>
+    curr           <span class="dt">int</span>
+    m              Mutex
+    blockedWaits   *list.List
+    blockedSignals *list.List
+}
+
+<span class="kw">func</span> newQSem(q <span class="dt">int</span>) QSem {
+    <span class="kw">var</span> m = newMutex()
+    qsem := QSem{q, q, m, list.New(), list.New()}
+
+    <span class="kw">return</span> qsem
+}
+
+<span class="kw">func</span> wait(qsem *QSem) {
+    lock(qsem.m)
+    <span class="kw">if</span> qsem.curr &gt; <span class="dv">0</span> {
+        <span class="kw">if</span> qsem.blockedSignals.Len() &gt; <span class="dv">0</span> {
+            <span class="kw">var</span> s = qsem.blockedSignals.Front()
+            qsem.blockedSignals.Remove(s)
+            unlock(qsem.m)
+            lock(s.Value.(Mutex)) <span class="co">// signal blocked signal thread</span>
+        } <span class="kw">else</span> {
+                qsem.curr--    <span class="co">// we won&#39;t decrement if</span>
+                                       <span class="co">// wait unblocks a signal</span>
+            unlock(qsem.m)
+        }
+    } <span class="kw">else</span> {
+        <span class="kw">var</span> w = newMutex()
+        qsem.blockedWaits.PushBack(w)
+        unlock(qsem.m)
+        unlock(w) <span class="co">// wait for signal on w</span>
+    }
+}
+
+<span class="kw">func</span> signal(qsem QSem) {
+    lock(qsem.m)
+    <span class="kw">if</span> qsem.curr &lt; qsem.q {
+        <span class="kw">if</span> qsem.blockedWaits.Len() &gt; <span class="dv">0</span> {
+            <span class="kw">var</span> w = qsem.blockedWaits.Front()
+            qsem.blockedWaits.Remove(w)
+            unlock(qsem.m)
+            lock(w.Value.(Mutex)) <span class="co">// signal blocked wait thread</span>
+        } <span class="kw">else</span> {
+                qsem.curr++    <span class="co">// we won&#39;t decrement if</span>
+                                       <span class="co">// signal unblocks a wait</span>
+            unlock(qsem.m)
+        }
+    } <span class="kw">else</span> {
+        <span class="kw">var</span> s = newMutex()
+        qsem.blockedSignals.PushBack(s)
+        unlock(qsem.m)
+        unlock(s) <span class="co">// wait for signal on s</span>
+    }
+}
+
+<span class="kw">func</span> main() {
+    <span class="kw">var</span> qsem = newQSem(<span class="dv">5</span>)
+    wait(&amp;qsem)
+
+    wait(&amp;qsem)
+    fmt.Printf(<span class="st">&quot;done %d </span><span class="ch">\n</span><span class="st">&quot;</span>,qsem.curr)
+
+}</code></pre></div>
+<h3 id="alternative-quantifizierter-semaphor-implementierung">Alternative Quantifizierter Semaphor Implementierung</h3>
+<p>Die Liste der &quot;blocked&quot; <code>wait</code>s und <code>signal</code>s modelliert eine Warteschlange. Intern verwendet Go solche Warteschlange im Falle von blockierten Sendern/Empfängern eines synchronen Kanals. Eine kürzere und direkte Implementierung der quantifizierten Semaphor ist deshalb wie folgt.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">type</span> QSem <span class="kw">struct</span> {
+     q              <span class="dt">int</span>
+     curr           <span class="dt">int</span>
+     m              Mutex
+     signalWaits    Mutex
+     signalSignals  Mutex        
+     noBlockedWaits <span class="dt">int</span>
+     noBlockedSignals <span class="dt">int</span>
+}</code></pre></div>
+<p>Ein blockierter <code>signal</code> Aufruf wartet auf <code>signalSignals</code>. Ein <code>wait</code> Aufruf testet, ob es blockierte <code>signal</code>s gibt.</p>
+<p>Beachte. Da es entweder <code>wait</code> und <code>signal</code> nie gleichzeitig blockiern, könnte anstatt <code>signalWaits</code> und <code>signalSignal</code> ein &quot;signal&quot; ausreichen.</p>
+<h3 id="kompletter-source-code-der-alternative">Kompletter Source Code der Alternative</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+
+<span class="kw">type</span> Mutex (<span class="kw">chan</span> <span class="dt">int</span>)
+
+<span class="kw">func</span> newMutex() Mutex {
+    <span class="kw">var</span> ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>, <span class="dv">1</span>)
+    <span class="kw">return</span> ch
+}
+
+<span class="kw">func</span> lock(m Mutex) {
+    m &lt;- <span class="dv">1</span>
+}
+
+<span class="kw">func</span> unlock(m Mutex) {
+    &lt;-m
+}
+
+<span class="kw">type</span> QSem <span class="kw">struct</span> {
+    q              <span class="dt">int</span>
+    curr           <span class="dt">int</span>
+    m              Mutex
+        signalWaits    Mutex
+        signalSignals  Mutex        
+        noBlockedWaits <span class="dt">int</span>
+        noBlockedSignals <span class="dt">int</span>
+}
+
+<span class="kw">func</span> newQSem(q <span class="dt">int</span>) QSem {
+    <span class="kw">var</span> m = newMutex()
+        qsem := QSem{q, q, m, newMutex(), newMutex(), <span class="dv">0</span>, <span class="dv">0</span>}
+
+    <span class="kw">return</span> qsem
+}
+
+<span class="kw">func</span> wait(qsem *QSem) {
+    lock(qsem.m)
+    <span class="kw">if</span> qsem.curr &gt; <span class="dv">0</span> {
+        <span class="kw">if</span> qsem.noBlockedSignals &gt; <span class="dv">0</span> {
+                        qsem.noBlockedSignals--
+            unlock(qsem.m)
+            lock(qsem.signalSignals) <span class="co">// signal blocked signal thread</span>
+        } <span class="kw">else</span> {
+                qsem.curr--
+            unlock(qsem.m)
+        }
+    } <span class="kw">else</span> {
+                qsem.noBlockedWaits++
+        unlock(qsem.m)
+        unlock(qsem.signalWaits) <span class="co">// wait for signal </span>
+    }
+}
+
+<span class="kw">func</span> signal(qsem QSem) {
+    lock(qsem.m)
+    <span class="kw">if</span> qsem.curr &lt; qsem.q {
+        <span class="kw">if</span> qsem.noBlockedWaits &gt; <span class="dv">0</span> {
+            qsem.noBlockedWaits--
+            unlock(qsem.m)
+            lock(qsem.signalWaits) <span class="co">// signal blocked wait thread</span>
+        } <span class="kw">else</span> {
+                qsem.curr++
+            unlock(qsem.m)
+        }
+    } <span class="kw">else</span> {
+                qsem.noBlockedSignals++
+        unlock(qsem.m)
+        unlock(qsem.signalSignals) <span class="co">// wait for signal </span>
+    }
+}
+
+<span class="kw">func</span> main() {
+    <span class="kw">var</span> qsem = newQSem(<span class="dv">5</span>)
+        wait(&amp;qsem)
+
+        wait(&amp;qsem)
+    fmt.Printf(<span class="st">&quot;done %d </span><span class="ch">\n</span><span class="st">&quot;</span>,qsem.curr)
+
+}</code></pre></div>
+<h3 id="vergleich-der-beiden-lösungen">Vergleich der beiden Lösungen</h3>
+<p>Die erste Lösung mit den expliziten Warteschlangen erscheint unnötig kompliziert (zumindest aber sehen wir so ein Beispiel von Listen in Go). Was könnte der Vorteil der ersten über der zweiten Lösung sein?</p>
+<h3 id="ausnutzung-von-nebenläufigkeit">Ausnutzung von Nebenläufigkeit</h3>
+<p>Nebenläufige Konzepte (Threads, Kanäle, ...) dienen zur Strukturierung komplexer Problemstellungen, wobei Teile von einander unabhängig (nebenläufig) ablaufen können.</p>
+<p>Ein Seiteneffekt der nebenläufigen Programmierung ist, dass falls die dementsprechende Hardware (z.B. Multicore) zur Verfügung steht, nebenläufige Programmteile parallel auf verschiedenen Rechnerkernen ausgeführt werden können.</p>
+<p>Bezogen auf die Implementierung des quantifizierten Semaphor, welche Teile können parallel ausgeführt werden?</p>
+<p>Im Falle der ersten Lösung, wartet jeder blockierte Thread auf ein auf den Thread bezogen eindeutiges Signal. Deshalb ist es möglich, dass gleichzeitig mehreren Threads ein &quot;darf fortfahren&quot; Signal geschickt wird. Im Falle der zweiten Lösung werden die &quot;darf fortfahren&quot; Signale sequentiell (nacheinander) abgearbeitet.</p>
+<p>Beachte. Der Flaschenhals ist natürlich der Zugriff auf die Warteschlange welcher auch in der ersten Lösung strikt nacheinander geschieht. Das &quot;darf fortfahren&quot; Signal aber kann gleichzeitg losgeschickt werden.</p>
+<p>Als eine weitere Steigerung der Nebenläufigkeit der ersten Lösung, könnten wir das &quot;darf fortfahren&quot; Signal in einem eigenen Thread losschicken.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> wait(qsem *QSem) {
+ ...
+            unlock(qsem.m)
+            <span class="kw">go</span> lock(s.Value.(Mutex)) <span class="co">// signal blocked signal thread</span>
+
+ ...
+}</code></pre></div>
+<p>Dadurch kann der &quot;main&quot; Thread schon mit seiner Arbeit fortfahren. Die Aufgabe des Signals losschicken wird von einem Hilfsthread erledigt.</p>
+<p>Beachte. Da Google Go (zum Teil) kooperatives Scheduling benutzt kann es durchaus sein, dass der theoretisch hohe Grad der Nebenläufigkeit nicht praktisch (d.h. parallel) ausgenutzt werden kann.</p>
+</div>
+<div id="nichtdeterministische-auswahl-select" class="slide section level1">
+<h1>Nichtdeterministische Auswahl (&quot;select&quot;)</h1>
+<ul>
+<li><p>Oftmals ist es notwendig gleichzeitig auf mehrere Ereignisse zu warten.</p></li>
+<li>Beispiel
+<ul>
+<li>Warte auf Kanal1 Nachricht</li>
+<li>Warte auf Kanal2 Nachricht</li>
+<li>Schicke Nachricht an Kanal3</li>
+</ul></li>
+<li><p>Welche Reihenfolge?</p></li>
+</ul>
+<p>Erster Versuch:</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">x = &lt;-ch1
+y = &lt;-ch2
+ch3 &lt;- <span class="dv">1</span></code></pre></div>
+<p>Was ist falls kein Sender auf <code>ch1</code> aber Sender auf <code>ch2</code>? Obige Programmsequenz blockiert.</p>
+<p>Probieren wir es damit.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">y = &lt;-ch2
+x = &lt;-ch1
+ch3 &lt;- <span class="dv">1</span></code></pre></div>
+<p>Blockiert wiederum falls falls kein Sender auf <code>ch2</code> aber Sender auf <code>ch1</code>?</p>
+<ul>
+<li>Alle drei der obigen Ereignisse können blockieren
+<ul>
+<li>Ereigniss = Senden/Empfangen via einem Kanal</li>
+</ul></li>
+<li>Wir wollen aber fortfahren, soblad eines der Ereignisse eintrift</li>
+<li>Das <code>select</code> Primitv erlaubt das gleichzeitige Warten auf mehrere Ereignisse</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">select</span> {
+  <span class="kw">case</span> x = &lt;-ch1: ...
+  <span class="kw">case</span> y = &lt;-ch2: ...
+  <span class="kw">case</span> ch3 &lt;- <span class="dv">1</span>:
+  <span class="co">// default and timeout possible</span>
+}</code></pre></div>
+<p>Beachte, falls mehrere Ereignisse eintreffen, wird eines zufällig ausgewählt. Alle nicht ausgewählten Ereignisse sind immer noch verfügbar.</p>
+<h2 id="beispiel-empfang-via-zweier-kanäle">Beispiel: Empfang via zweier Kanäle</h2>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;math/rand&quot;</span>
+
+<span class="kw">func</span> snd(ch <span class="kw">chan</span> <span class="dt">int</span>) {
+    <span class="kw">var</span> x <span class="dt">int</span> = <span class="dv">0</span>
+    <span class="kw">for</span> {
+        x++
+        ch &lt;- x
+        <span class="kw">if</span> rand.Int()%<span class="dv">2</span> == <span class="dv">0</span> {
+            time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+        } <span class="kw">else</span> {
+            time.Sleep(<span class="dv">5</span> * <span class="fl">1e9</span>)
+        }
+    }
+
+}
+
+<span class="kw">func</span> rcv(ch1 <span class="kw">chan</span> <span class="dt">int</span>, ch2 <span class="kw">chan</span> <span class="dt">int</span>) {
+    <span class="kw">var</span> x <span class="dt">int</span>
+    <span class="kw">for</span> {
+        <span class="kw">select</span> {
+        <span class="kw">case</span> x = &lt;-ch1:
+            fmt.Printf(<span class="st">&quot;received ch1 %d </span><span class="ch">\n</span><span class="st">&quot;</span>, x)
+        <span class="kw">case</span> x = &lt;-ch2:
+            fmt.Printf(<span class="st">&quot;received ch2 %d </span><span class="ch">\n</span><span class="st">&quot;</span>, x)
+        }
+
+    }
+
+}
+
+<span class="kw">func</span> main() {
+    <span class="kw">var</span> ch1 <span class="kw">chan</span> <span class="dt">int</span> = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">var</span> ch2 <span class="kw">chan</span> <span class="dt">int</span> = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">go</span> snd(ch1)
+    <span class="kw">go</span> snd(ch2)
+    rcv(ch1, ch2)
+
+}</code></pre></div>
+<h2 id="beispiel-newsreader">Beispiel: Newsreader</h2>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+
+<span class="kw">func</span> reuters(ch <span class="kw">chan</span> <span class="dt">string</span>) {
+    ch &lt;- <span class="st">&quot;REUTERS&quot;</span>
+
+}
+
+<span class="kw">func</span> bloomberg(ch <span class="kw">chan</span> <span class="dt">string</span>) {
+    ch &lt;- <span class="st">&quot;BLOOMBERG&quot;</span>
+
+}
+
+<span class="kw">func</span> newsReaderWithThreads(reutersCh <span class="kw">chan</span> <span class="dt">string</span>, bloombergCh <span class="kw">chan</span> <span class="dt">string</span>) {
+    ch := <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">string</span>)
+
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        ch &lt;- (&lt;-reutersCh)
+    }()
+
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        ch &lt;- (&lt;-bloombergCh)
+    }()
+
+    x := &lt;-ch
+    fmt.Printf(<span class="st">&quot;got news from %s </span><span class="ch">\n</span><span class="st">&quot;</span>, x)
+
+}
+
+<span class="kw">func</span> newsReaderWithSelect(reutersCh <span class="kw">chan</span> <span class="dt">string</span>, bloombergCh <span class="kw">chan</span> <span class="dt">string</span>) {
+    <span class="kw">var</span> x <span class="dt">string</span>
+
+    <span class="kw">select</span> {
+    <span class="kw">case</span> x = &lt;-reutersCh:
+    <span class="kw">case</span> x = &lt;-bloombergCh:
+    }
+
+    fmt.Printf(<span class="st">&quot;got news from %s </span><span class="ch">\n</span><span class="st">&quot;</span>, x)
+
+}
+
+<span class="kw">func</span> test1() {
+    reutersCh := <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">string</span>)
+    bloombergCh := <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">string</span>)
+
+    <span class="kw">go</span> reuters(reutersCh)
+    <span class="kw">go</span> bloomberg(bloombergCh)
+    newsReaderWithThreads(reutersCh, bloombergCh)
+    newsReaderWithThreads(reutersCh, bloombergCh)
+}
+
+<span class="kw">func</span> test2() {
+    reutersCh := <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">string</span>)
+    bloombergCh := <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">string</span>)
+
+    <span class="kw">go</span> reuters(reutersCh)
+    <span class="kw">go</span> bloomberg(bloombergCh)
+    newsReaderWithSelect(reutersCh, bloombergCh)
+    newsReaderWithSelect(reutersCh, bloombergCh)
+}
+
+<span class="kw">func</span> main() {
+        <span class="co">// test1() fuehrt potentiell zum deadlock</span>
+    test2()
+}</code></pre></div>
+<ul>
+<li><p>Wir betrachten einen Versuch <code>select</code> mittels Hilfsthreads zu emulieren.</p></li>
+<li><p>Die Idee ist, dass jeweils zwei Threads auf entweder eine Reuters oder Bloomberg Nachricht warten. Diese Nachricht wird dann weitergeleitet zu dem Newsreader. Siehe <code>newsReaderWithThreads</code>.</p></li>
+<li><p>Es gibt jedoch ein Problem im Falle mehrerer Newsreader.</p>
+<ul>
+<li><p>Der Newsreader erwartet nur eine Nachricht (entweder von Reuters oder Bloomberg).</p></li>
+<li><p>Beide Nachrichten werden aber potentiell aus dem jeweiligen Nachrichtenkanal geholt.</p></li>
+<li><p>Da nur eine Nachricht verwendet wird, bleibt die andere Nachricht ungenutzt und wird quasi weggeworfen</p></li>
+<li><p>Aus diesem Grund fuehrt eine weiterer Aufruf von <code>newsReaderWithThreads</code> zu einem Deadlock.</p></li>
+</ul></li>
+<li><p>Anders im Fall von <code>newsReaderWithSelect</code>. Dank dem <code>select</code> wird nur entweder eine Nachricht aus dem Reuters oder eine Nachricht aus dem Bloomberg Kanal geholt.</p></li>
+<li><p>Sprich falls der erste <code>newsReaderWithSelect</code> Aufruf die Reuters Nachricht verwendet, hat der zweite <code>newsReaderWithSelect</code> Aufruf immer noch die Moeglichkeit die Bloomberg Nachricht zu holen.</p></li>
+</ul>
+<h2 id="beispiel-ausführung-mehrer-tasks">Beispiel: Ausführung mehrer Tasks</h2>
+<ul>
+<li>Mehrere Tasks sollen gleichzeitig ausgeführt werden.</li>
+<li>Das Programm soll fortfahren sobald alle Tasks abgeschlossen sind.</li>
+<li>Dieses Nebenläufige Programmiermuster ist als <em>barrier</em> bekannt.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">func</span> task1() { time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>) }
+<span class="kw">func</span> task2() { time.Sleep(<span class="dv">2</span> * <span class="fl">1e9</span>) }
+<span class="kw">func</span> task3() { time.Sleep(<span class="dv">3</span> * <span class="fl">1e9</span>) }
+
+<span class="kw">func</span> barrier() {
+    <span class="kw">var</span> ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="co">// run all three tasks concurrently</span>
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        task1()
+        ch &lt;- <span class="dv">1</span> <span class="co">// signal done</span>
+    }()
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        task2()
+        ch &lt;- <span class="dv">1</span>
+    }()
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        task3()
+        ch &lt;- <span class="dv">1</span>
+    }()
+
+        <span class="co">// collect results concurrently</span>
+    timeout := time.After(<span class="dv">4</span> * <span class="fl">1e9</span>)
+    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">3</span>; i++ {
+        <span class="kw">select</span> {
+        <span class="kw">case</span> &lt;-ch:
+        <span class="kw">case</span> &lt;-timeout:
+            fmt.Println(<span class="st">&quot;timed out&quot;</span>)
+            <span class="kw">return</span>
+        }
+
+    }
+    fmt.Println(<span class="st">&quot;done&quot;</span>)
+}
+
+<span class="kw">func</span> main() {
+    barrier()
+}</code></pre></div>
+<p>Beachte</p>
+<ul>
+<li>Wir modellieren effektiv eine zählende Semaphore</li>
+<li>Im einfachsten könnten wir einfach dreimal einen Empfang ausführen</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="co">// barrier</span>
+&lt;- ch
+&lt;- ch
+&lt;- ch</code></pre></div>
+<ul>
+<li>In obiger Modellierung, wurde noch zusätzlich ein Timeout modelliert (mit Hilfe von <code>select</code>)</li>
+</ul>
+<h2 id="select-mit-timeouts-und-default">Select mit timeouts und default</h2>
+<ul>
+<li><p><code>select</code> wählt einen Fall (case) zufällig aus</p></li>
+<li><p>Falls kein Fall eintritt blockiert <code>select</code></p></li>
+<li><p>Mit Hilfe eines Timeouts kann die Blockierung aufgehoben werden (Beispiel siehe oben)</p></li>
+<li><p>Es ist auch möglich eine Blockierung immer zu verhindern mit Hilfe von <code>default</code>.</p></li>
+<li><p>Betrachte folgendes Beispiel</p></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">select</span> {
+  <span class="kw">case</span> &lt;-ch1:
+  <span class="kw">case</span> ch2&lt;-<span class="dv">1</span>:
+  <span class="kw">default</span>:
+}</code></pre></div>
+<ul>
+<li><p>Falls keiner der ersten beiden Fälle eintritt, wird der dritte (default) Fall ausgewählt.</p></li>
+<li><p>Mit Hilfe von default können Ereignisse priorisiert werden. Siehe Übungsaufgabe sleeping barber.</p></li>
+</ul>
+<h2 id="erweiterung-barrier-ausführung-mehrer-tasks">Erweiterung &quot;barrier&quot; (Ausführung mehrer Tasks)</h2>
+<p>Obige Lösung garantiert, dass <em>alle</em> Tasks innerhalb einer gewissen Zeitschranke abgearbeitet werden. Wir betrachten folgende Erweiterung bei der <em>ein</em> Task innerhalb einer Zeitschranke abgearbeitet seind muss. Z.B. alle Tasks sollen innerhalb von 500ms abgearbeitet sein, wobei jeder Task maximal 100ms Zeit beanspruchen soll.</p>
+<h3 id="erster-versuch">Erster Versuch</h3>
+<p>Hier ist ein erster Versuch. Wir betrachten nur einen Auszug (&quot;code snippet&quot;).</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">    <span class="kw">var</span> ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="co">// run all three tasks concurrently</span>
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        task1()
+        ch &lt;- <span class="dv">1</span> <span class="co">// signal done</span>
+    }()
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        task2()
+        ch &lt;- <span class="dv">1</span>
+    }()
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        task3()
+        ch &lt;- <span class="dv">1</span>
+    }()
+
+    timeout := time.After(<span class="dv">500</span> * time.Millisecond)
+    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">3</span>; i++ {
+        timeoutEach := time.After(<span class="dv">100</span> * time.Millisecond)
+        <span class="kw">select</span> {
+        <span class="kw">case</span> &lt;-ch:
+        <span class="kw">case</span> &lt;-timeout:
+            fmt.Println(<span class="st">&quot;timed out (global)&quot;</span>)
+            <span class="kw">return</span>
+        <span class="kw">case</span> &lt;-timeoutEach:
+            fmt.Println(<span class="st">&quot;timed out (local)&quot;</span>)
+            <span class="kw">return</span>
+        }
+
+    }
+    fmt.Println(<span class="st">&quot;done&quot;</span>)</code></pre></div>
+<p>Wir setzen einen globalen als auch einen lokalen Timeout. Der lokale Timeout wird in jeder Rund neu gestartet und soll einen einzelnen Task überwachen.</p>
+<p>Funktioniert diese Lösung?</p>
+<p>Nein! Der lokale Timeout wird neu gestartet, aber die einzelnen Tasks werden schon ausgeführt. Deshalb haben wir keine Garantie, dass ein einzelner Task maximal 100ms Zeit beansprucht.</p>
+<h3 id="korrektur">Korrektur</h3>
+<p>Wir benötigen eine Zeitüberwachung für jeden Task. Dazu führen wir folgende Hilfsfunktion ein.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> completeWithin(task <span class="kw">func</span>(), ms time.Duration) <span class="kw">chan</span> <span class="dt">bool</span> {
+    <span class="kw">var</span> ch = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">var</span> res = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">bool</span>)
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        task()
+        ch &lt;- <span class="dv">1</span>
+    }()
+    t := time.After(ms * time.Millisecond)
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        <span class="kw">select</span> {
+        <span class="kw">case</span> &lt;-ch:
+            res &lt;- <span class="ot">true</span>
+        <span class="kw">case</span> &lt;-t:
+            res &lt;- <span class="ot">false</span>
+        }
+    }()
+    <span class="kw">return</span> res
+}</code></pre></div>
+<p>Die Funktion <code>completeWithin</code> liefert als Rückgabewert einen Kanal mit dessen Hilfe wir testen können, ob die Zeit eingehalten wurde.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">    <span class="co">// 1. run all three tasks concurrently</span>
+    <span class="co">// must complete within 500ms</span>
+    r1 := completeWithin(task1, <span class="dv">500</span>)
+    r2 := completeWithin(task2, <span class="dv">500</span>)
+    r3 := completeWithin(task3, <span class="dv">500</span>)
+
+    <span class="co">// 2. query tasks </span>
+    b1 := &lt;-r1
+    b2 := &lt;-r2
+    b3 := &lt;-r3
+
+    <span class="co">// 3. check for any timeout</span>
+    <span class="kw">if</span> b1 &amp;&amp; b2 &amp;&amp; b3 {
+        fmt.Println(<span class="st">&quot;done&quot;</span>)
+    } <span class="kw">else</span> {
+        fmt.Println(<span class="st">&quot;timed out&quot;</span>)
+    }</code></pre></div>
+<p>Beachte, Funktion <code>completeWithin</code> ist nicht blockierend.</p>
+<ol style="list-style-type: decimal">
+<li><p>Alle drei Tasks und deren Zeitüberwachung werden gestartet.</p></li>
+<li><p>Via des Kanals werden der jeweiligen Status abgefragt.</p></li>
+<li><p>Überprüfung ob Zeitüberschreitung</p></li>
+</ol>
+<h2 id="implementierung-von-select">Implementierung von `select'</h2>
+<h3 id="go-laufzeitsystem-grobe-uebersicht">Go Laufzeitsystem (grobe Uebersicht)</h3>
+<ol style="list-style-type: decimal">
+<li><p>Alle 'cases' werde in einem Feld (array) verwaltet.</p></li>
+<li><p>Periodisch schaut das Go Laufzeitsystem nach, ob einer der 'cases' verfuegbar ist (sprich synchronisiert werden kann). Im Detail:</p></li>
+</ol>
+<ul>
+<li><p>Zuerst werden die Feldelemente (zufaellig) permutiert.</p></li>
+<li><p>Dann wird ein Element nach dem anderen geprueft (ob Synchronisation moeglich). Falls keine Synchronisation moeglich, macht das Go Laufzeitsystem mit anderen Threads weiter. Ansonsten wird der erste zu synchroniserend 'case' (Feldelement) ausgewaehlt.</p></li>
+</ul>
+<h3 id="alternative-implementierung">Alternative Implementierung</h3>
+<p>Das <code>select</code> Kommando ist eine maechtige Erweiterung. Eine naive Kodierung mit Hilfe von Hilfsthreads und Kanaelen liefert ein anderes Ergebnis (siehe 'newsReader' Beispiel).</p>
+<p>Interessanterweise, ist eine vollstaendige Kodierung von <code>select</code> nur mit Threads und Kanaelen moeglich. Bei Interesse kann dieses Thema in einer Projektarbeit behandelt werden.</p>
+</div>
+<div id="aufgabe-erweiterung-sleeping-barber" class="slide section level1">
+<h1>Aufgabe: Erweiterung Sleeping Barber</h1>
+<p>Erweitern Sie das Sleeping Barber Beispiel:</p>
+<ol style="list-style-type: decimal">
+<li><p>Mehrere Barbiere</p></li>
+<li><p>Kanal pro Barbier</p></li>
+<li><p>Priorisierung, z.B.</p>
+<ul>
+<li><p>Auswahl eines verfügbaren Barbiers (aus einer Auswahl)</p></li>
+<li><p>Präferenz</p></li>
+</ul></li>
+</ol>
+<p>Zur Wiederhohlung, die einfache Version.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">const</span> (
+    NUMBER_OF_CHAIRS = <span class="dv">8</span>
+)
+
+<span class="kw">type</span> Request <span class="kw">struct</span> {
+    id  <span class="dt">int</span>
+    ack <span class="kw">chan</span> <span class="dt">int</span>
+}
+
+<span class="kw">func</span> barber(waitQ (<span class="kw">chan</span> Request)) {
+
+    <span class="kw">for</span> {
+        req := &lt;-waitQ
+        fmt.Printf(<span class="st">&quot;BARBER: Serving customer %d </span><span class="ch">\n</span><span class="st">&quot;</span>, req.id)
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+        fmt.Printf(<span class="st">&quot;BARBER: Done with customer %d </span><span class="ch">\n</span><span class="st">&quot;</span>, req.id)
+        req.ack &lt;- <span class="dv">1</span>
+
+    } <span class="co">// for</span>
+
+} <span class="co">// barber</span>
+
+<span class="kw">func</span> customer(waitQ (<span class="kw">chan</span> Request), id <span class="dt">int</span>) {
+    <span class="kw">var</span> ack = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">for</span> {
+
+        fmt.Printf(<span class="st">&quot;CUSTOMER: %d wants hair cut </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+        req := Request{id, ack}
+        waitQ &lt;- req
+        fmt.Printf(<span class="st">&quot;CUSTOMER: %d sits on chair </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+        &lt;-ack
+        fmt.Printf(<span class="st">&quot;CUSTOMER: %d served by barber </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+
+    } <span class="co">// for</span>
+
+} <span class="co">// customer</span>
+
+<span class="kw">func</span> main() {
+
+    <span class="kw">var</span> (
+        waitQ = <span class="fu">make</span>(<span class="kw">chan</span> Request, NUMBER_OF_CHAIRS)
+    )
+
+    <span class="kw">go</span> customer(waitQ, <span class="dv">1</span>)
+    <span class="kw">go</span> customer(waitQ, <span class="dv">2</span>)
+    barber(waitQ)
+
+}</code></pre></div>
+<h2 id="lösungsvorschläge">Lösungsvorschläge</h2>
+<p>Zweiter 'barber' Thread.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> main() {
+
+    <span class="kw">var</span> (
+        waitQ = <span class="fu">make</span>(<span class="kw">chan</span> Request, NUMBER_OF_CHAIRS)
+    )
+
+    <span class="kw">go</span> customer(waitQ, <span class="dv">1</span>)
+    <span class="kw">go</span> customer(waitQ, <span class="dv">2</span>)
+    <span class="kw">go</span> barber(waitQ)
+    barber(waitQ)
+
+}</code></pre></div>
+<p>Kanal 'waitQ' ist der Flaschhals.</p>
+<p>Idee, designierter Kanal pro 'barber'. Auswahl von 'customer' via select. Priorisierung möglich.</p>
+</div>
+<div id="aufgabe-speisende-philosophen" class="slide section level1">
+<h1>Aufgabe: Speisende Philosophen</h1>
+<p>Wir betrachten das Problem der speisenden Philosophen. Die Anordnung der Gabeln soll dabei keine Rolle spielen. Sprich wir gehen von N Philosophen aus die an einem Tisch sitzen an welchen sich N Gabeln befinden. Zum Essen sind pro Philosoph 2 Gabeln notwendig.</p>
+<h2 id="versuch-1">Versuch 1</h2>
+<p>Hier ist eine mögliche Umsetzung.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">func</span> philo(id <span class="dt">int</span>, forks <span class="kw">chan</span> <span class="dt">int</span>) {
+
+    <span class="kw">for</span> {
+        &lt;-forks
+        &lt;-forks
+        fmt.Printf(<span class="st">&quot;%d eats </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+        forks &lt;- <span class="dv">1</span>
+        forks &lt;- <span class="dv">1</span>
+
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>) <span class="co">// think</span>
+
+    }
+
+}
+
+<span class="kw">func</span> main() {
+    <span class="kw">var</span> forks = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>, <span class="dv">3</span>)
+    forks &lt;- <span class="dv">1</span>
+    forks &lt;- <span class="dv">1</span>
+    forks &lt;- <span class="dv">1</span>
+    <span class="kw">go</span> philo(<span class="dv">1</span>, forks)
+    <span class="kw">go</span> philo(<span class="dv">2</span>, forks)
+    philo(<span class="dv">3</span>, forks)
+}</code></pre></div>
+<p>Wir modellieren die Gabeln als gepufferten Kanal. Jeder Philosoph benötigt zwei Gabeln. Ergo, zweifaches Lesen auf dem <code>fork</code> Kanal.</p>
+<p>Welche Probleme können auftreten?</p>
+<h3 id="diskussion">Diskussion</h3>
+<p>Verhungerung (starvation) ist möglich.</p>
+<p>Verklemmung (deadlock) ist möglich.</p>
+<h2 id="version-2">Version 2</h2>
+<p>Hier ist ein weiterer Versuch.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">func</span> philo(id <span class="dt">int</span>, forks <span class="kw">chan</span> <span class="dt">int</span>) {
+    <span class="kw">for</span> {
+        &lt;-forks
+        <span class="kw">select</span> {
+        <span class="kw">case</span> &lt;-forks:
+            fmt.Printf(<span class="st">&quot;%d eats </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+            time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+            forks &lt;- <span class="dv">1</span>
+            forks &lt;- <span class="dv">1</span>
+
+            time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>) <span class="co">// think</span>
+        <span class="kw">default</span>:
+            forks &lt;- <span class="dv">1</span>
+        }
+    }
+
+}
+
+<span class="kw">func</span> main() {
+    <span class="kw">var</span> forks = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>, <span class="dv">3</span>)
+    forks &lt;- <span class="dv">1</span>
+    forks &lt;- <span class="dv">1</span>
+    forks &lt;- <span class="dv">1</span>
+    <span class="kw">go</span> philo(<span class="dv">1</span>, forks)
+    <span class="kw">go</span> philo(<span class="dv">2</span>, forks)
+    philo(<span class="dv">3</span>, forks)
+}</code></pre></div>
+<h3 id="diskussion-1">Diskussion</h3>
+<p>Verhungerung (starvation) ist möglich.</p>
+<p>Ist eine Verklemmung (deadlock) immer noch möglich? Nein, ein 'deadlock' wird vermieden. Falls eine zweite Gabel nicht verfügbar, wird die erste Gabel zurückgelegt.</p>
+<p>Durch diesen Trick bekommen wir ein neues Problem. Ein 'livelock' ist möglich. Anders als im Falle eines 'deadlocks', kommt das System nie zum Stillstand. Das Ziel (Philosoph isst) wird aber nie erreicht.</p>
+<h3 id="version-3">Version 3</h3>
+<p>Betrachte folgende weitere Variante.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+<span class="kw">import</span> <span class="st">&quot;time&quot;</span>
+
+<span class="kw">func</span> philo(id <span class="dt">int</span>, forks <span class="kw">chan</span> <span class="dt">int</span>) {
+
+    <span class="kw">for</span> {
+        &lt;-forks
+        &lt;-forks
+        fmt.Printf(<span class="st">&quot;%d eats </span><span class="ch">\n</span><span class="st">&quot;</span>, id)
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>)
+        forks &lt;- <span class="dv">1</span>
+        forks &lt;- <span class="dv">1</span>
+
+        time.Sleep(<span class="dv">1</span> * <span class="fl">1e9</span>) <span class="co">// think</span>
+
+    }
+
+}
+
+<span class="kw">func</span> main() {
+    <span class="kw">var</span> forks = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">go</span> <span class="kw">func</span>() { forks &lt;- <span class="dv">1</span> }()
+    <span class="kw">go</span> <span class="kw">func</span>() { forks &lt;- <span class="dv">1</span> }()
+    <span class="kw">go</span> <span class="kw">func</span>() { forks &lt;- <span class="dv">1</span> }()  
+    <span class="kw">go</span> philo(<span class="dv">1</span>, forks)
+    <span class="kw">go</span> philo(<span class="dv">2</span>, forks)
+    philo(<span class="dv">3</span>, forks)
+}</code></pre></div>
+<p>Welche der oben beschriebenen Probleme können noch auftreten?</p>
+</div>
+<div id="zusammenfassung" class="slide section level1">
+<h1>Zusammenfassung</h1>
+<ul>
+<li><p>Überblick Go Primitive zur simultanen Programmierung mittels Austausch von Nachrichten</p>
+<ul>
+<li><p>Multi-threading</p></li>
+<li><p>Getypter Kanal</p></li>
+<li><p>Synchrone (ohne Puffer) und asynchrone Kanaele (mit Puffer)</p></li>
+<li><p>Nichtdeterministische Auswahl</p></li>
+</ul></li>
+<li><p>Theoretische Grundlagen: Communicating Sequential Processes von Sir Tony Hoare</p></li>
+<li>Verwandte Sprachen (die es zum grossen Teil besser können):
+<ul>
+<li>Concurrent ML</li>
+<li>Haskell</li>
+<li>Scala</li>
+<li>Erlang</li>
+</ul></li>
+<li><p>Typische Probleme der nebenlaeufigen Programmierung</p>
+<ul>
+<li><p>Deadlock</p></li>
+<li><p>Livelock</p></li>
+<li><p>Starvation</p></li>
+</ul></li>
+<li><p>Ausblick</p>
+<ul>
+<li>Programmanalyse zum Erkennen von Deadlock, ...</li>
+</ul></li>
+</ul>
+</div>
+</body>
+</html>

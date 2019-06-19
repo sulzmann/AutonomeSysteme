@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Martin Sulzmann" />
+  <title>Dynamic Verification - Data Races and Deadlocks</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Dynamic Verification - Data Races and Deadlocks</h1>
+  <p class="author">
+Martin Sulzmann
+  </p>
+</div>
+<div id="overview" class="slide section level1">
+<h1>Overview</h1>
+<p>Programs may show non-deterministic behavior (e.g. see concurrency).</p>
+<p>Issue:</p>
+<ul>
+<li><p>Test case successful</p></li>
+<li><p>But it also could happen that the test case (for the same inputs) fails</p></li>
+</ul>
+<h2 id="motivating-examples">Motivating examples</h2>
+<h3 id="data-races">Data races</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">x := <span class="dv">0</span>               <span class="co">// P1</span>
+
+<span class="kw">go</span> <span class="kw">func</span>() {
+  lock()             <span class="co">// P2</span>
+  unlock()           <span class="co">// P3</span>
+  x = <span class="dv">1</span>              <span class="co">// P4                </span>
+  }()
+
+x = <span class="dv">2</span>                <span class="co">// P5</span>
+lock()               <span class="co">// P6</span>
+unlock()             <span class="co">// P7</span></code></pre></div>
+<p>We consider a specific execution run represented as an interleaved sequence of execution steps. We refer to the interleaved sequence of execution steps as the <b>program trace</b> (or trace for short).</p>
+<pre><code>1.   x := 0     P1
+2.   x = 2      P5
+3.   lock()     P6
+4.   unlock()   P7
+5.   lock()     P2
+6.   unlock()   P3
+7.   x = 1      P4</code></pre>
+<p>Looks good? What about step 1 and step 2? Statements are executed in program order (as they appear in the program text), so first P1 and then P5.</p>
+<p>Here is another execution run.</p>
+<pre><code>1.   x := 0     P1
+2.   lock()     P2
+3.   unlock()   P3
+4.   x = 1      P4
+5.   x = 2      P5
+6.   lock()     P6
+7.   unlock()   P7</code></pre>
+<p>Now, we are in trouble! Step 4 and 5 form a rite/write data race. The two write statements appear right next to each other in the trace. Unlike in the earlier trace, both statements belong to distinct threads. Hence, their actual execution on some Hardware might lead to a conflict. This is commonly referred to as a data race.</p>
+<p>Definition: Two write statements belonging to two distinct threads are in a <b>write/write data race</b> if they appear right next to each other in a trace.</p>
+<p>Points to note:</p>
+<ul>
+<li><p>There may be a data race.</p></li>
+<li><p>The data race may only show up for some specific program run.</p></li>
+</ul>
+<h3 id="deadlocks">Deadlocks</h3>
+<p>Similar observations apply to the case of deadlocks.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">x := <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+
+<span class="kw">go</span> <span class="kw">func</span>() {
+    x &lt;- <span class="dv">1</span>
+   }()
+
+<span class="kw">go</span> <span class="kw">func</span>() {
+    &lt;- x
+ }()
+
+&lt;- x</code></pre></div>
+</div>
+<div id="dynamic-data-race-prediction" class="slide section level1">
+<h1>Dynamic data race prediction</h1>
+<h2 id="motivation">Motivation</h2>
+<p>Challenge: Based on a specific program run represented by a trace, we wish to predict if a data race may occur.</p>
+<p>Consider the following example (variant of the above).</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">x := <span class="dv">0</span>               <span class="co">// P1</span>
+
+<span class="kw">go</span> <span class="kw">func</span>() {
+  lock()             <span class="co">// P2</span>
+  unlock()           <span class="co">// P3</span>
+  x = <span class="dv">1</span>              <span class="co">// P4                </span>
+  }()
+
+lock()               <span class="co">// P5</span>
+x = <span class="dv">2</span>                <span class="co">// P6</span>
+unlock()             <span class="co">// P7</span></code></pre></div>
+<p>Consider the following trace resulting from a specific execution run.</p>
+<pre><code>1.  x := 0    P1
+2.  lock()    P2
+3.  unlock()  P3
+4.  x = 1     P4
+5.  lock()    P5
+6.  x = 2     P6
+7.  unlock()  P7</code></pre>
+<p>Point to note. P4 and P6 are not in race because they don't appear right next to each other in the above trace. However, it is possible to reorder the trace such P4 and P6 are in a race.</p>
+<p>Consider</p>
+<pre><code>1.  x := 0    P1
+2.  lock()    P2
+3.  unlock()  P3
+4.  lock()    P5
+5.  x = 1     P4
+6.  x = 2     P6
+7.  unlock()  P7</code></pre>
+<h2 id="trace-reorderings">Trace reorderings</h2>
+<p>Under what conditions are we allowed to reorder a trace?</p>
+<p>Need to take care of write-read dependencies.</p>
+<p>Consider</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">var</span> x, y <span class="dt">int</span>
+
+<span class="kw">go</span> <span class="kw">func</span>() {
+  y = <span class="dv">0</span>               <span class="co">// P1</span>
+  x = <span class="dv">0</span>               <span class="co">// P2</span>
+}()
+
+<span class="kw">go</span> <span class="kw">func</span>() {
+  <span class="kw">if</span> x == <span class="dv">0</span> {        <span class="co">// P3</span>
+     y = <span class="dv">1</span>           <span class="co">// P4</span>
+   }
+  }()
+}</code></pre></div>
+<p>and the resulting trace</p>
+<pre><code>1.  y = 0             P1
+2.  x = 0             P2
+3.  x == 0            P3
+4.  y = 1             P4</code></pre>
+<p>We find that <code>x = 0</code> (write) and <code>x == 0</code> (read) are in a write-read race.</p>
+<p>Can we reorder the trace such that P1 and P4 are in a (write-write) race? It seems possible as both operations are part of distinct threads.</p>
+<p>No! This is not possible because there is a write-read dependency between P2 and P3. The read value affects the control-flow and the subsequent operations (like P4) in this thread.</p>
+<h2 id="references">References</h2>
+<p><a href="https://en.wikipedia.org/wiki/Happened-before">Happened-before</a></p>
+<p><a href="https://arxiv.org/abs/1808.00185">What Happens - After the First Race? Enhancing the Predictive Power of Happens - Before Based Dynamic Race Detection</a></p>
+<p><a href="https://arxiv.org/abs/1905.10855">Data Race Prediction for Inaccurate Traces</a></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Martin Sulzmann" />
+  <title>Verification Notes</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Verification Notes</h1>
+  <p class="author">
+Martin Sulzmann
+  </p>
+</div>
+<div class="slide section level1">
+
+<p>Develop from first principle.</p>
+<p>Start with simple while like language. Discuss instrumentation issues.</p>
+<p>Formal specification.</p>
+<p>Static verification via language approximation.</p>
+</div>
+<div id="simple-while-language" class="slide section level1">
+<h1>Simple while language</h1>
+<pre><code> b ::=   Boolean expressions
+
+ p ::= p ; p                   -- Sequence
+    |  if b { p } else {p }    -- Conditional statements
+    |  for b { p }             -- Iteration
+    |  open
+    |  close
+    |  read
+    |  write
+    | ...                      -- Further stuff, assignment etc</code></pre>
+<p>Some simplified language in style of G. We assume some file primitives (open, close, write, read).</p>
+</div>
+<div id="resource-usage-verification" class="slide section level1">
+<h1>Resource Usage Verification</h1>
+<p>File access operations:</p>
+<ul>
+<li><p>open</p></li>
+<li><p>close</p></li>
+<li><p>read</p></li>
+<li><p>write</p></li>
+</ul>
+<h2 id="formal-specification">(Formal) Specification</h2>
+<p>We wish to ensure that file primitives are used according to certain rules (policy).</p>
+<p>File usage policy (preventing bad behavior/safety):</p>
+<ol style="list-style-type: decimal">
+<li><p>After openening a file there can be reads, writes and closing the file.</p></li>
+<li><p>After a write there shall be no reads.</p></li>
+</ol>
+<p>How can such rules be specified? Regular expressions, finite state machines, ...</p>
+<p>Regular property, can be specified via regular expression:</p>
+<pre><code>open . (read* . (write . write* + epsilon)) . close</code></pre>
+<p>We use the following notation:</p>
+<pre><code>. denotes concatenation
+
+* denotes the Kleene stard
+
++ denotes alternatives where we assume that * binds tighter than . and +,
+and . binds tighter than +
+
+epsilon denotes the empty word</code></pre>
+<p>The above property can also be specified via the following finite state machine (FSA).</p>
+<pre><code>Initial state: 1
+Final state: 3
+
+1 --open--&gt; 2
+2 --read--&gt; 2
+2 --close--&gt; 3
+2 --write--&gt; 4
+4 --write--&gt; 4
+4 --close--&gt; 3</code></pre>
+<p>Error state and transitions are left implicit.</p>
+<h2 id="verification">Verification</h2>
+<p>How to ensure that the rules (policy) are satisfied?</p>
+<p>Need to decide if we wish to enforce the rules <em>dynamically</em> or <em>statically</em>.</p>
+</div>
+<div id="dynamic-verification" class="slide section level1">
+<h1>Dynamic Verification</h1>
+<h2 id="online">Online</h2>
+<p>While exectuing the program, for each file access, check if resource usage policy still holds.</p>
+<ol style="list-style-type: decimal">
+<li><p>Need to monitor run-time behavior, keep track of each file access.</p></li>
+<li><p>Turn resource usage policy into a finite state machine (FSA).</p></li>
+<li><p>Concurrently to the program, check if FSA may be in a bad state (after processing of a file primitive).</p></li>
+</ol>
+<h2 id="offline">Offline</h2>
+<ol style="list-style-type: decimal">
+<li><p>While executing the program, log each file access.</p></li>
+<li><p>Run the program a finite number of steps.</p></li>
+<li><p>Run the FSA on the log file.</p></li>
+</ol>
+<h2 id="instrumentation-and-tracing">Instrumentation and Tracing</h2>
+<p>Both methods (online and offline) assume that the running program is instrumented such that we can keep track of the events we are interested in. In our case, events are open, close, read and write.</p>
+</div>
+<div id="static-verification" class="slide section level1">
+<h1>Static Verification</h1>
+<p>Check that for all possible program runs, the resource usage policy holds.</p>
+<p>Need a sound (static) approximation of the file usage behavior of the program. How?</p>
+<p>Idea: Map program to a regular expression!</p>
+<p>We consider a simplified subset of Go consisting of sequential, if-then-else and for statements. We write <code>p</code>, <code>q</code> to refer to such programs. we write <code>b</code> to refer to Boolean conditions. We write <code>r</code>, <code>s</code> to refer to regular expressions.</p>
+<p>We write <code>p ==&gt; r</code> to denote the approximation of program <code>p</code> via regular expression <code>r</code>. Approximation is performed by observing the structure of programs.</p>
+<pre><code>open     ==&gt;     open
+
+close    ==&gt;     close
+
+write    ==&gt;     write
+
+read     ==&gt;     read
+
+p ; q    ==&gt;     r . s
+where
+p  ==&gt;  r
+q  ==&gt;  s
+
+
+if b { p } else { q }  ==&gt; r + s
+where
+p  ==&gt;  r
+q  ==&gt;  s
+
+for b { p }   ==&gt;  r*
+where
+p  ==&gt;  r</code></pre>
+<p>Examples using pseudo Go code.</p>
+<p>Example 1.</p>
+<pre><code>open;
+if (...) { read } else { write }</code></pre>
+<p>Its approximation is as follows.</p>
+<pre><code>open . (read + write)</code></pre>
+<p>Example 2.</p>
+<pre><code>open;
+for (...) {
+x = 1
+if (x &gt;= 1) { read } else { write }
+};
+close
+~~~~~~~~
+
+Its approximation is as follows.
+
+~~~~~~~~
+open . (read + write)* . close</code></pre>
+<p>Static verification via a form of language containment!</p>
+<ol style="list-style-type: decimal">
+<li><p>Suppose <code>p ==&gt; s</code> and <code>r</code> describes the resource usage policy.</p></li>
+<li><p>Check that <code>s</code> is prefix-closed with respect to <code>r</code>: For any word <code>w in L(s)</code> there exists some word <code>v</code> such that <code>w . v in L(r)</code>.</p></li>
+</ol>
+<p>Why prefix-closed? Because programs may not terminate. For such technical details, check the mentioned APLAS'03 paper below.</p>
+<p>The above check is decidable. Standard language containment is too strong as we only want to check if some error state is reachable.</p>
+<p>For property</p>
+<pre><code>open . (read* . (write . write* + epsilon)) . close</code></pre>
+<p>we find that the approximation of Example 1 satisfies this property (is prefix-closed) whereas the approximation of Example 2 violates this property.</p>
+<p>Recall the approximation of Example 2.</p>
+<pre><code>open . (read + write)* . close</code></pre>
+<p>The above implies the word <code>open . read . write . read . close</code> which clearly violates the property.</p>
+<p>A closer inspection of Example 2 shows that the behavior <code>open . read . write . read . close</code> is not reproducible in the actual program. Hence, this is an example for a false positive.</p>
+<p>For further details, see <a href="https://www.researchgate.net/publication/221323167_Resource_Usage_Verification">Resource Usage Verification, APLAS'03</a></p>
+</div>
+</body>
+</html>

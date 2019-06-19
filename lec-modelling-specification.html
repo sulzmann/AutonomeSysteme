@@ -1,0 +1,1213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Martin Sulzmann" />
+  <title>Model-Based Specification</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Model-Based Specification</h1>
+  <p class="author">
+Martin Sulzmann
+  </p>
+</div>
+<div id="motivation" class="slide section level1">
+<h1>Motivation</h1>
+<h2 id="formal-reasoning">Formal reasoning?</h2>
+<p><em>Who cares?</em></p>
+<p>No need. We know how to program. Whatever we need we find via 'google' ...</p>
+<h2 id="the-need-for-formal-reasoning">The need for formal reasoning</h2>
+<p>&quot;Informatik&quot; = Information + Automation</p>
+<p>Goal:</p>
+<ul>
+<li><p>Understand the problem (Analysis)</p></li>
+<li><p>Code up a solution (Implementation)</p></li>
+<li><p>Make sure that the solution is correct and matches the problem (Verification + Validation)</p></li>
+</ul>
+<p>Verification:</p>
+<ul>
+<li><p>&quot;The product we have built is right&quot;</p></li>
+<li><p>No bugs, ...</p></li>
+<li><p>Implementation meets the specification</p></li>
+</ul>
+<p>Validation:</p>
+<ul>
+<li><p>&quot;We have built the right product&quot;</p></li>
+<li><p>Specification meets the problem description (&quot;customer needs&quot;)</p></li>
+</ul>
+<p>Terminology:</p>
+<ul>
+<li>System: Refers to the product. As we focus on software aspects, in our case consists of program code. Can be rather complex as the program code may run on several machines, remotely, web-based etc. There may be interactions among sub-systems etc. Usually, it is a system of systems!</li>
+</ul>
+<h3 id="example">Example</h3>
+<p>The problem description says:</p>
+<pre><code>The increment function shall increment some value by one.</code></pre>
+<p>The specification given to the programmer says:</p>
+<pre><code>For each int value, the function shall produce some int value.</code></pre>
+<p>The programmer implements.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go">inc (x <span class="dt">int</span>) <span class="dt">int</span> {
+     <span class="kw">return</span> <span class="dv">0</span>
+}</code></pre></div>
+<p>So, verification succeeds but validation fails.</p>
+<h2 id="modeling">Modeling</h2>
+<p>Often phrased as model-based software development.</p>
+<p>Purpose:</p>
+<ul>
+<li><p>Assist implementation and specification tasks.</p></li>
+<li><p>Avoid coding errors.</p></li>
+<li><p>Make use of high-level abstractions.</p></li>
+<li><p>Make model easy to extend, maintain, ...</p></li>
+</ul>
+<p>What is a (formal) model? Comes in all shapes and sizes.</p>
+<p><b>Important</b> We expect that for any model we find a concise semantic description (so we actually know what a specific model means!)</p>
+<p>Examples:</p>
+<ul>
+<li><p>The programming language C is a low-level programming <em>model</em>. Great for low-level stuff but prune to tricky to spot programming mistakes.</p></li>
+<li><p>Some of you find that Java is a much better, more high-level programming <em>model</em>. Some coding errors can't happen in the first place (think of memory management). Also, Java offers higher level of abstractions (classes, ...). This can be useful to achieve a solution which is easier to maintain, ...</p></li>
+</ul>
+<p>Textual versus graphical models:</p>
+<ul>
+<li><p>Any programming language serves as a text-based modeling language. For example, Perl is a great language for write scripts. The modeling focus there is on scripting tasks.</p></li>
+<li><p>We will also encounter graphical modeling languages. For example, automata-based models. Some programing languages offer a graphical interface.</p></li>
+</ul>
+<p>Logic-based models:</p>
+<ul>
+<li><p>Consider Boolean expressions to describe the control-flow behavior in your program.</p></li>
+<li><p>We will also consider temporal logics to describe the temporal behavior of a system.</p></li>
+</ul>
+<p>What about UML?</p>
+<ul>
+<li>Well, UML offers a wide range of models. My main criticism is that these models often lack some formal underpinnings. So we won't directly discuss UML here.</li>
+</ul>
+<h2 id="specification">Specification</h2>
+<ul>
+<li>Make use of a formal model to describe the intended behavior of your system.</li>
+</ul>
+<p><b>Important:</b></p>
+<ul>
+<li><p>We can use the same type of model to describe the actual working of the system (its implementation) and its specification.</p></li>
+<li><p>Extreme case. The implementation serves as the specification! Does this make sense?</p></li>
+<li><p>Common approach:</p>
+<ul>
+<li><p>Use a model with an <em>operational</em> flavor to describe the implementation (&quot;How does the system work?&quot;).</p></li>
+<li><p>Use a model with a <em>logic-based</em> flavor for specification (&quot;What is the intended behavior?&quot;).</p></li>
+</ul></li>
+</ul>
+</div>
+<div id="state-based-modeling" class="slide section level1">
+<h1>State-Based Modeling</h1>
+<h2 id="finite-state-machines-fsm">Finite State Machines (FSM)</h2>
+<p>We consider a number of examples where FSM are useful for modeling the system's behavior.</p>
+<h3 id="hirte-wolf-kohl-ziege">&quot;Hirte-Wolf-Kohl-Ziege&quot;</h3>
+<p>Modeling with finite state machines</p>
+<p>see black board</p>
+<h2 id="count">&quot;count&quot;</h2>
+<p>Modeling with Mealy/Moore machines (input as well as output).</p>
+<p>Application: Generation of test cases.</p>
+<p>see black board</p>
+<h3 id="zustandsbasierte-modellierung">Zustandsbasierte Modellierung</h3>
+<div class="sourceCode"><pre class="sourceCode c"><code class="sourceCode c">
+<span class="ot">#include &quot;stdio.h&quot;</span>
+
+<span class="co">/*</span>
+
+<span class="co">1. Woerter in einem String zaehlen.</span>
+
+<span class="co">Was ist ein Wort?</span>
+<span class="co">Wir definieren ein Wort als eine Sequenz von</span>
+<span class="co">Zeichen welche nicht getrennt ist durch Leerzeichen.</span>
+
+<span class="co">2. Zustands-basierte Modellierung.</span>
+
+<span class="co">Wir definieren unser Alphabet als die Menge</span>
+
+<span class="co">Sigma = { CH, EOS, WS }</span>
+
+<span class="co">wobei</span>
+
+<span class="co">EOS = Nullterminator</span>
+
+<span class="co">WS = Leerzeichen (&#39;white space&#39;)</span>
+
+<span class="co">CH = Zeichen (&#39;character&#39;)</span>
+
+
+<span class="co">Die Menge von Zustaenden und Transitionen ist wie folgt.</span>
+
+<span class="co">1 -- WS --&gt; 1</span>
+
+<span class="co">1 -- EOS --&gt; 2</span>
+
+<span class="co">1 -- CH --&gt; 3</span>
+
+<span class="co">3 -- WS --&gt; 1</span>
+
+<span class="co">3 -- CH --&gt; 3</span>
+
+<span class="co">3 -- EOS --&gt; 2</span>
+
+<span class="co">Menge von Zustaenden ist {1,2,3}</span>
+
+<span class="co">1 ist der Startzustand</span>
+
+<span class="co">3 ist der Finalzustand</span>
+
+<span class="co">Obiger Automat ist ein Beipsiel eines endlichen Automaten.</span>
+
+<span class="co">3. Zaehlen von Woertern.</span>
+
+<span class="co">Um die Woerten zu zaehlen, benoetigen wir neben einer Eingabe (Zeichen WS, CH, EOS)</span>
+<span class="co">auch eine Ausgabe (Anzahl der gefunden Woerter).</span>
+
+<span class="co">Dazu koennen wir einen Mealy/Moore Automaten verwenden.</span>
+<span class="co">Z.B. im Fall eines Mealy Automaten koennen wir auf die Transition eine Ausgabe legen.</span>
+
+<span class="co">Notation.</span>
+
+<span class="co">Wir schreiben</span>
+
+<span class="co">state1 -- In / Out --&gt; state2</span>
+
+<span class="co">Fuer einen Uebergang von Zustand state1 nach Zustand state2,</span>
+<span class="co">falls das aktuelle Eingabesymbol In ist.</span>
+<span class="co">Als Ausgabe finden wir Out.</span>
+<span class="co">Ein Mealy Automate liefert einen Trace von Ausgabesymbolen.</span>
+<span class="co">Wir benutzen zur Vereinfachung eine Zustandsvariable.</span>
+
+
+<span class="co">-- / cnt=0 --&gt; 1</span>
+
+<span class="co">1 -- WS --&gt; 1</span>
+
+<span class="co">1 -- EOS --&gt; 2</span>
+
+<span class="co">1 -- CH / cnt++ --&gt; 3</span>
+
+<span class="co">3 -- WS --&gt; 1</span>
+
+<span class="co">3 -- CH --&gt; 3</span>
+
+<span class="co">3 -- EOS --&gt; 2</span>
+
+
+
+<span class="co"> */</span>
+
+
+
+<span class="co">// Implementierung 1</span>
+
+<span class="dt">char</span>* scanWS(<span class="dt">char</span>* s) {
+
+  <span class="kw">while</span>(*s == &#39; &#39;) {
+    s++;
+  }
+  <span class="kw">return</span> s;  
+}
+
+<span class="dt">int</span> isCH(<span class="dt">char</span> c) {
+  <span class="kw">return</span> (c != &#39; &#39; &amp;&amp; c != &#39;\<span class="dv">0</span>&#39;);
+}
+
+<span class="dt">char</span>* scanCH(<span class="dt">char</span>* s) {
+
+  <span class="kw">while</span>(isCH(*s)) {
+    s++;
+  }
+  <span class="kw">return</span> s;
+}
+
+
+<span class="dt">int</span> countWords(<span class="dt">char</span>* s) {
+  <span class="dt">int</span> cnt = <span class="dv">0</span>;
+
+  s = scanWS(s);
+
+  <span class="kw">while</span>(isCH(*s)) {
+    cnt++;
+    s = scanCH(s);
+    s = scanWS(s);
+  }
+  <span class="kw">return</span> cnt;
+}
+
+<span class="co">// Implementierung 2</span>
+<span class="co">// Direkte Umsetzung des Modells.</span>
+
+<span class="dt">int</span> countWordsModell(<span class="dt">char</span>* s) {
+  <span class="dt">int</span> state = <span class="dv">1</span>;
+  <span class="dt">int</span> cnt = <span class="dv">0</span>;
+
+  <span class="kw">while</span>(<span class="dv">1</span>) {
+    <span class="kw">switch</span>(state) {
+    <span class="kw">case</span> <span class="dv">1</span>:
+       <span class="kw">if</span>(*s == &#39; &#39;)
+     state = <span class="dv">1</span>;
+       <span class="kw">if</span>(*s == &#39;\<span class="dv">0</span>&#39;)
+     state = <span class="dv">2</span>;
+       <span class="kw">if</span>(isCH(*s)) {
+     cnt++;
+     state = <span class="dv">3</span>;
+       }
+       <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="dv">2</span>:
+      <span class="kw">return</span> cnt;              
+    <span class="kw">case</span> <span class="dv">3</span>:
+       <span class="kw">if</span>(*s == &#39; &#39;)
+     state = <span class="dv">1</span>;
+       <span class="kw">if</span>(*s == &#39;\<span class="dv">0</span>&#39;)
+     state = <span class="dv">2</span>;
+       <span class="kw">if</span>(isCH(*s))
+     state = <span class="dv">3</span>;
+       <span class="kw">break</span>;
+
+    } <span class="co">// switch</span>
+
+   s++; <span class="co">// next symbol</span>
+
+  } <span class="co">// while</span>
+}
+
+
+
+<span class="dt">int</span> main() {
+
+  <span class="co">// Write your own tests and use cases :)</span>
+  
+  <span class="kw">return</span> <span class="dv">1</span>;
+}</code></pre></div>
+<h2 id="communicating-finite-state-machines-cfsm">Communicating Finite State Machines (CFSM)</h2>
+<p>Communication among FSM. How?</p>
+<p>Transitions with input and output actions.</p>
+<p>Synchronization via hand-shake.</p>
+<h3 id="definition">Definition</h3>
+<pre><code>Let C be a finite alphabet of channel names.
+For each x in C, we refer to x! as an output action over channel x and
+to x? as an input action over channel x.
+
+Let S be a finite set of states. We generally use symbols p,q to refer to states.
+
+We define a CFSM = (M_1, ..., M_n) as an n-tuple of finite state machines M_i.
+
+Each finite state machine M consists of 
+
+(1) a finite set of states S where there is a designated starting state,
+    written M.init, and
+
+(2) a finite set of transitions of the following three forms
+
+      p ----&gt; q     
+
+      p -x!-&gt; q
+
+      p -x?-&gt; q
+
+where x in C and p,q in S.
+
+We refer to the first kind as an &quot;epsilon&quot; transition
+and to the second and third kind, as output and input
+transitions respectively
+
+Let p_i be a state of the FSM M_i.
+We refer to (p_1, ..., p_n) as a (state) configuration of the CFSM.
+We refer to (M_1.init, ..., M_n.init) as the initial configuration of the CFSM.
+
+
+Execution proceeds by rewriting configurations which boils
+down to executing transitions of the individual FSM.
+Epsilon transitions can be executed spontaneously whereas
+input and output transititions require synchronization.
+
+
+
+  (p_1, ..., p_i, ..., p_n) -----&gt;   (p_1, ..., q_i, ..., p_n)
+
+
+          if we find  p_i -----&gt; q_i in M_i
+
+
+  (p_1, ..., p_i, ..., p_j, ..., p_n) --x--&gt;   (p_1, ..., q_i, ..., q_j, ..., p_n)  
+
+          if either    p_i -x!-&gt; q_i in M_i  and p_j -x?-&gt; q_j in M_j
+             or        p_i -x?-&gt; q_i in M_i  and p_j -x!-&gt; q_j in M_j
+
+
+We refer to a path as a sequence of execution steps starting from the initial configuration.
+
+There may be several (alternative) paths and paths may not be finite (there are no final states).
+We can represent all possible execution steps as a tree-like structure where the
+root represents the initial configuration.
+
+
+</code></pre>
+<h3 id="examples">Examples</h3>
+<p>&quot;black-board&quot;</p>
+<h3 id="go-versus-cfsm">Go versus CFSM</h3>
+<p>&quot;black-board&quot;</p>
+</div>
+<div id="temporal-specification" class="slide section level1">
+<h1>Temporal specification</h1>
+<h2 id="motivation-1">Motivation</h2>
+<p>Specify the behavior of a system over time.</p>
+<ul>
+<li><p>Eventually ...</p></li>
+<li><p>Always ...</p></li>
+<li><p>Sometimes ...</p></li>
+<li><p>If somewhen ... then from here on always ...</p></li>
+</ul>
+<h2 id="timed-computation-tree-logic-tctl">Timed Computation Tree Logic (TCTL)</h2>
+<p>Specify the (expected) behavior of a CFSM in terms of the tree-like structure which is obtained by execution of the CFSM.</p>
+<h3 id="definition-1">Definition</h3>
+<pre><code>TCTL ::=   A[] B
+      |    A&lt;&gt; B
+      |    E[] B
+      |    E&lt;&gt; B
+      |    B --&gt; B
+
+B ::=  SomeAtomicProposition
+  |   B and B
+  |   B or B
+  |   B imply B
+  |   not B
+  |   (B)
+
+
+B makes statements about configurations, for example
+
+   M_1.init and M_2.exit
+
+  M_1 is in the initial state and M_2 ist in the exist state
+
+Informal semantic meaning:
+
+A     for all paths
+
+E     for at least one path
+
+[]    for all configurations
+
+&lt;&gt;    for at least one configuration
+
+
+Considering the specific cases.
+
+
+A[]B   For all paths and configurations along each path B holds.
+
+A&lt;&gt;B   For all paths there is at least one configuration for which B holds.
+
+E[]B   There exists a path and along that path,
+       for all configurations B holds.
+
+E&lt;&gt;B   There exists a path and along that path,
+       for at least one configuration B holds.
+
+
+Special case:
+
+B1 --&gt; B2   = A[] (B1 imply A&lt;&gt; B2)
+
+      For all paths, if we encounter a configuration for which B1 holds,
+      then for all paths which continue from that configuration,
+           we must find a configuration where B2 holds.</code></pre>
+<h3 id="safety-versus-liveness">Safety versus Liveness</h3>
+<p>Safety = Something bad never happens.</p>
+<pre><code>
+A[] B    Invariant
+
+E[] B   Some &quot;safe&quot; path exists</code></pre>
+<p>Liveness = Something good will eventually happen.</p>
+<pre><code>A&lt;&gt; B              We eventually reach &quot;B&quot;
+
+B1 --&gt; B2          &quot;B1&quot; eventually leads to &quot;B2&quot;</code></pre>
+<h3 id="algebraic-laws">Algebraic Laws</h3>
+<pre><code>not A [] B = E &lt;&gt; not B
+
+not A &lt;&gt; B = E [] not B
+
+not E [] B = A &lt;&gt; not B
+
+not E &lt;&gt; B = A [] not B</code></pre>
+<h2 id="linear-temporal-logic-ltl">Linear Temporal Logic (LTL)</h2>
+<p>Specify the (expected) behavior of a CFSM in terms of the traces which are obtained by execution of the CFSM.</p>
+<h3 id="definition-2">Definition</h3>
+<pre><code>Trace = sequence of synchronization points = channel names.
+
+We write &quot;config&quot; to denote a configuration where config_0
+represents the initial configuration.
+
+Consider the path
+
+   config_0
+   --x_1--&gt;
+   config_1
+   --x_2--&gt;
+   ....
+
+Then, the trace implied by the above path consists of
+
+   x_1 x_2 ...
+
+
+Recall that paths are infinite (and so are traces!).</code></pre>
+<p>LTL is a form of linear logic which states properties about the traces which are obtained by execution of the CFSM.</p>
+<pre><code>L   ::=   x               where x in C
+    |   L /\ L
+    |   L \/ L
+    |   ! L
+    |   globally L             
+    |   eventually L           
+    |   L until L
+    |   next L
+    |   (L)
+
+
+
+LTL infinite trace semantics.
+
+Let w be an infinite sequence of channel names.
+
+We write w^i to denote the trace obtained by dropping the first i channels.
+We write w[i] to refer to the i-th position in w.
+We start counting with 0.
+
+We write w |= L to denote that L satisfies w.
+
+w |= x            iff   w[0] = x
+
+w |= L1 /\ L2     iff   w |= L1 and w |= L2
+
+w |= L1 \/ L2     iff   w |= L1 or w |= L2
+
+w |= ! L          iff   w |= L does not hold
+
+w |= globally L   iff forall i.  w^i |= L
+
+w |= eventually L iff exists i. w^i |= L
+
+w |= L1 until L2  iff exists i&gt;=0. w^i |= L2 and forall 0&lt;= k &lt; i. w^k |= L1
+
+                      so either L2 holds immediately, or
+                      at some point in the future, where L1 holds at each instant till that point
+
+w |= next L       iff w^1 |= L</code></pre>
+</div>
+<div id="model-checking" class="slide section level1">
+<h1>Model checking</h1>
+<p>Check if a model meets a specification.</p>
+<p>For our case. Check that the CFSM meets some TCTL or LTL property, written <code>CFSM |= TCTL</code>.</p>
+<p>Further reading about <a href="https://en.wikipedia.org/wiki/Model_checking">model checking</a></p>
+<h2 id="model-checking-applications">Model checking applications</h2>
+<p>Verification of hardware/software systems.</p>
+<h3 id="classical-uses-cases">Classical uses cases</h3>
+<ul>
+<li><p>Get an idea about the &quot;system's&quot; behavior at an early stage.</p></li>
+<li><p>Validate customer requirements. What do you want? Is this the intended behavior?</p></li>
+<li><p>We sometimes can automatically generated (runnable) code out of a model. Assuming the model has been validated and the generated code reflects the behavior of the model, the code is verified by construction!</p></li>
+<li><p>In general, the model is an abstraction of the actual system (some details are left out).</p></li>
+</ul>
+<h3 id="modern-uses">Modern uses</h3>
+<ul>
+<li><p>Test case generation.</p></li>
+<li><p>Build a model of the system.</p></li>
+<li><p>Either manually (via simulation) or automatically via temporal properties, generate test cases</p></li>
+</ul>
+<h3 id="issues">Issues</h3>
+<ul>
+<li><p>Model checking is meant to complete testing and simulation (not a substitute!)</p></li>
+<li><p>Model checking a Java program directly is not feasible in general.</p></li>
+<li><p>The model we abstract away certain details (to remain decidable). For example, both branches (&quot;then&quot; and &quot;else&quot;) are possible regardless of the Boolean condition.</p></li>
+<li><p>Hence, model checking highly depends on how accurately the model abstracts the actual system behavior.</p></li>
+<li><p>Failure in the model does not necessarily mean the behavior can be replayed in the actual system. This is known as &quot;false positives&quot;.</p></li>
+<li><p>On the other hand, an actual bug may be undetected because the model does not fully capture the entire system.</p></li>
+</ul>
+<h2 id="model-checking-algorithm">Model checking algorithm</h2>
+<p>Here's a rough sketch of the model checking algorithm.</p>
+<ol style="list-style-type: decimal">
+<li><p>CFSM |= TCTL means that all behavior (paths) in the CFSM are also valid in the TCTL formula.</p></li>
+<li><p>Logically, this corresponds to an implication: <code>forall path. path in CFSM implies path in TCTL</code>.</p></li>
+<li><p>The standard approach is to check the opposite (contradiction).</p></li>
+<li><p><code>exists path. path in CFSM and path not in TCTL</code>.</p></li>
+<li><p>This property is checked as follows.</p></li>
+<li><p>Turn the TCTL formula into an automata A1.</p></li>
+<li><p>Build the complement of A1 which yields automata A2.</p></li>
+<li><p>Run both, CFSM and A2, simultaneously, if we reach a &quot;final&quot; state in the product automta of A1 and A2, we have found a counter-example!</p></li>
+<li><p>Otherwise, the property <code>CFSM |= TCTL</code> holds.</p></li>
+</ol>
+<h2 id="references">References</h2>
+<p><a href="https://cacm.acm.org/magazines/2010/2/69362-software-model-checking-takes-off/fulltext">Software Model Checking Takes Off</a></p>
+<p><a href="https://users.ece.cmu.edu/~koopman/pubs/koopman14_toyota_ua_slides.pdf">A Case Study of Toyota Unintended Acceleration and Software Safety</a></p>
+<p><a href="http://vlsi.colorado.edu/~fabio/hwmcTutorialCAV2014.pdf">Hardware model checking (tutorial)</a></p>
+<p><a href="http://spinroot.com/spin/whatispin.html">Spin - a popular model checker</a></p>
+</div>
+<div id="uppaal" class="slide section level1">
+<h1>UPPAAL</h1>
+<p><a href="www.uppaal.org/">UPPAAL</a> is a modelchecker with a graphical language for modeling based on Communicating Finite State Machines (CFSM) and a temporal specification language based on the Temporal Computation Tree Logic (TCTL). <em>Modelchecking</em> means that UPPAAL verifies if the model satisfies the specification.</p>
+<h2 id="from-uppaal-to-go">From UPPAAL to Go</h2>
+<p>Let's consider the &quot;coffeemachine&quot; example (see sample solution ilias).</p>
+<div class="figure">
+<img src="Coffeemachine.png" alt="Coffeemachine" />
+<p class="caption">Coffeemachine</p>
+</div>
+<div class="figure">
+<img src="User.png" alt="User" />
+<p class="caption">User</p>
+</div>
+<h3 id="first-try">First try</h3>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">const</span> (
+    Active    = <span class="dv">0</span>
+    Initial   = <span class="dv">1</span>
+    HasCoffee = <span class="dv">2</span>
+)
+
+<span class="kw">func</span> coffeeMachine(coffee, enter, exit, payback,
+    insert20, insert50, insert100 (<span class="kw">chan</span> <span class="dt">int</span>)) {
+    <span class="kw">var</span> state <span class="dt">int</span> = Initial
+    <span class="kw">var</span> acc <span class="dt">int</span> = <span class="dv">0</span>
+
+    <span class="kw">for</span> {
+        <span class="kw">switch</span> {
+        <span class="kw">case</span> state == Initial:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-enter:
+                state = Active
+            <span class="kw">case</span> &lt;-exit:
+            } <span class="co">// select</span>
+        <span class="kw">case</span> state == Active:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-coffee:
+                <span class="kw">if</span> acc &gt;= <span class="dv">150</span> {
+                    acc = acc - <span class="dv">150</span>
+                }
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-payback:
+                <span class="kw">if</span> acc &gt; <span class="dv">0</span> {
+                    acc = <span class="dv">0</span>
+                }
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            } <span class="co">// select</span>
+
+        } <span class="co">// switch</span>
+    } <span class="co">// for</span>
+
+}</code></pre></div>
+<p>There's a problem.</p>
+<p>In the UPPAAL model:</p>
+<ul>
+<li>If <code>acc &gt;= 150</code> <em>and</em> we synchronize via the <code>coffee</code> channel ...</li>
+</ul>
+<p>In our Go implementation,</p>
+<ul>
+<li><p>we first check if we can synchronize via <code>coffee</code>, and</p></li>
+<li><p>then afterwards check the guard <code>acc &gt;= 150</code>.</p></li>
+</ul>
+<p>So, we need to check both conditions (can we synchroinze and is the guard satisfied) atomically! How to do achieve this in Go?</p>
+<h3 id="second-try-using-default">Second try (using <code>default</code>)</h3>
+<p>Recall the principle of <code>select</code> paired with <code>default</code>.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">select</span> {
+   <span class="kw">case</span> ch &lt;- <span class="dv">1</span>: <span class="co">// Action1</span>
+   <span class="kw">default</span>:      <span class="co">// Action2</span>
+}</code></pre></div>
+<p>With out <code>default</code>, the <code>select</code> will block if we can send via channel <code>ch</code>. With <code>default</code>, we first check all cases, if none of the cases (such as send via channel <code>ch</code>) is available, we pick the <code>default</code> case.</p>
+<p>Applied to our example.</p>
+<ol style="list-style-type: decimal">
+<li><p>Check for guard.</p></li>
+<li><p>Then, check if synchronization is possible.</p></li>
+<li><p>If we can't synchronize then &quot;exit&quot; via <code>default</code>.</p></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> coffeeMachine(coffee, enter, exit, payback,
+    insert20, insert50, insert100 (<span class="kw">chan</span> <span class="dt">int</span>)) {
+    <span class="kw">var</span> state <span class="dt">int</span> = Initial
+    <span class="kw">var</span> acc <span class="dt">int</span> = <span class="dv">0</span>
+
+    <span class="kw">for</span> {
+        <span class="kw">switch</span> {
+        <span class="kw">case</span> state == Initial:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-enter:
+                state = Active
+            <span class="kw">case</span> &lt;-exit:
+            } <span class="co">// select</span>
+        <span class="kw">case</span> state == Active:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            <span class="kw">default</span>:
+                <span class="kw">if</span> acc &gt;= <span class="dv">150</span> {
+                    <span class="kw">select</span> {
+                    <span class="kw">case</span> &lt;-coffee:
+                        acc = acc - <span class="dv">150</span>
+                    <span class="kw">case</span> &lt;-payback:
+                        acc = <span class="dv">0</span>
+                    <span class="kw">default</span>:
+
+                    }
+                } <span class="co">// if</span>
+
+                <span class="kw">if</span> acc &lt; <span class="dv">150</span> &amp;&amp; acc &gt; <span class="dv">0</span> {
+                    <span class="kw">select</span> {
+                    <span class="kw">case</span> &lt;-payback:
+                        acc = <span class="dv">0</span>
+                    <span class="kw">default</span>:
+
+                    }
+                }
+            } <span class="co">// select</span>
+
+        } <span class="co">// switch</span>
+    } <span class="co">// for</span>
+
+}</code></pre></div>
+<p>This works! But is a bit ugly cause we encounter a &quot;busy-waiting loop&quot;. We might repeatedly check for the guard and then the synchronization.</p>
+<p>Unfortunately, in Go we can't impose a guard condition on the cases in a <code>select</code> statement.</p>
+<h3 id="final-try">Final try</h3>
+<p>Idea: Duplicate states by distinguishing if the guard is satisfied or not.</p>
+<p>So, in the state <code>state == Active &amp;&amp; acc &gt;= 150</code> a synchronization via <code>coffee</code> is possible.</p>
+<p>Here's the implementation of this idea.</p>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="kw">func</span> coffeeMachine(coffee, enter, exit, payback,
+    insert20, insert50, insert100 (<span class="kw">chan</span> <span class="dt">int</span>)) {
+    <span class="kw">var</span> state <span class="dt">int</span> = Initial
+    <span class="kw">var</span> acc <span class="dt">int</span> = <span class="dv">0</span>
+
+    <span class="kw">for</span> {
+        <span class="kw">switch</span> {
+        <span class="kw">case</span> state == Initial:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-enter:
+                state = Active
+            <span class="kw">case</span> &lt;-exit:
+            } <span class="co">// select</span>
+        <span class="kw">case</span> state == Active &amp;&amp; acc &gt;= <span class="dv">150</span>:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-coffee:
+                acc = acc - <span class="dv">150</span>
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-payback:
+                acc = <span class="dv">0</span>
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            } <span class="co">// select</span>
+
+        <span class="kw">case</span> state == Active &amp;&amp; <span class="dv">150</span> &gt; acc &amp;&amp; acc &gt; <span class="dv">0</span>:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-payback:
+                acc = <span class="dv">0</span>
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            } <span class="co">// select</span>
+
+        <span class="kw">case</span> state == Active &amp;&amp; acc &lt;= <span class="dv">0</span>:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            } <span class="co">// select</span>
+        } <span class="co">// switch</span>
+    } <span class="co">// for</span>
+
+}</code></pre></div>
+<p>Pro: We no longer require a &quot;busy-waiting&quot; loop.</p>
+<p>Cons: Codeduplication (because states are combined with guard conditions).</p>
+<h4 id="complete-final-try-code-with-user">Complete (final try) code with user</h4>
+<div class="sourceCode"><pre class="sourceCode go"><code class="sourceCode go"><span class="co">// Translating UPPAAL to Go</span>
+<span class="co">// Martin Sulzmann</span>
+
+<span class="kw">package</span> main
+
+<span class="kw">import</span> <span class="st">&quot;fmt&quot;</span>
+
+<span class="kw">const</span> (
+    Active    = <span class="dv">0</span>
+    Initial   = <span class="dv">1</span>
+    HasCoffee = <span class="dv">2</span>
+)
+
+<span class="kw">func</span> coffeeMachine(coffee, enter, exit, payback,
+    insert20, insert50, insert100 (<span class="kw">chan</span> <span class="dt">int</span>)) {
+    <span class="kw">var</span> state <span class="dt">int</span> = Initial
+    <span class="kw">var</span> acc <span class="dt">int</span> = <span class="dv">0</span>
+
+    <span class="kw">for</span> {
+        <span class="kw">switch</span> {
+        <span class="kw">case</span> state == Initial:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-enter:
+                state = Active
+            <span class="kw">case</span> &lt;-exit:
+            } <span class="co">// select</span>
+        <span class="kw">case</span> state == Active &amp;&amp; acc &gt;= <span class="dv">150</span>:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-coffee:
+                acc = acc - <span class="dv">150</span>
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-payback:
+                acc = <span class="dv">0</span>
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            } <span class="co">// select</span>
+
+        <span class="kw">case</span> state == Active &amp;&amp; <span class="dv">150</span> &gt; acc &amp;&amp; acc &gt; <span class="dv">0</span>:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-payback:
+                acc = <span class="dv">0</span>
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            } <span class="co">// select</span>
+
+        <span class="kw">case</span> state == Active &amp;&amp; acc &lt;= <span class="dv">0</span>:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            } <span class="co">// select</span>
+        } <span class="co">// switch</span>
+    } <span class="co">// for</span>
+
+}
+
+<span class="kw">func</span> coffeeMachineWrong(coffee, enter, exit, payback,
+    insert20, insert50, insert100 (<span class="kw">chan</span> <span class="dt">int</span>)) {
+    <span class="kw">var</span> state <span class="dt">int</span> = Initial
+    <span class="kw">var</span> acc <span class="dt">int</span> = <span class="dv">0</span>
+
+    <span class="kw">for</span> {
+        <span class="kw">switch</span> {
+        <span class="kw">case</span> state == Initial:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-enter:
+                state = Active
+            <span class="kw">case</span> &lt;-exit:
+            } <span class="co">// select</span>
+        <span class="kw">case</span> state == Active:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-coffee:
+                <span class="kw">if</span> acc &gt;= <span class="dv">150</span> {
+                    acc = acc - <span class="dv">150</span>
+                }
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-payback:
+                <span class="kw">if</span> acc &gt; <span class="dv">0</span> {
+                    acc = <span class="dv">0</span>
+                }
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            } <span class="co">// select</span>
+
+        } <span class="co">// switch</span>
+    } <span class="co">// for</span>
+
+}
+
+<span class="kw">func</span> coffeeMachineBusyWait(coffee, enter, exit, payback,
+    insert20, insert50, insert100 (<span class="kw">chan</span> <span class="dt">int</span>)) {
+    <span class="kw">var</span> state <span class="dt">int</span> = Initial
+    <span class="kw">var</span> acc <span class="dt">int</span> = <span class="dv">0</span>
+
+    <span class="kw">for</span> {
+        <span class="kw">switch</span> {
+        <span class="kw">case</span> state == Initial:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-enter:
+                state = Active
+            <span class="kw">case</span> &lt;-exit:
+            } <span class="co">// select</span>
+        <span class="kw">case</span> state == Active:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> &lt;-insert20:
+                acc = acc + <span class="dv">20</span>
+            <span class="kw">case</span> &lt;-insert50:
+                acc = acc + <span class="dv">50</span>
+            <span class="kw">case</span> &lt;-insert100:
+                acc = acc + <span class="dv">100</span>
+            <span class="kw">case</span> &lt;-exit:
+                state = Initial
+            <span class="kw">default</span>:
+                <span class="kw">if</span> acc &gt;= <span class="dv">150</span> {
+                    <span class="kw">select</span> {
+                    <span class="kw">case</span> &lt;-coffee:
+                        acc = acc - <span class="dv">150</span>
+                    <span class="kw">case</span> &lt;-payback:
+                        acc = <span class="dv">0</span>
+                    <span class="kw">default</span>:
+
+                    }
+                } <span class="co">// if</span>
+
+                <span class="kw">if</span> acc &lt; <span class="dv">150</span> &amp;&amp; acc &gt; <span class="dv">0</span> {
+                    <span class="kw">select</span> {
+                    <span class="kw">case</span> &lt;-payback:
+                        acc = <span class="dv">0</span>
+                    <span class="kw">default</span>:
+
+                    }
+                }
+            } <span class="co">// select</span>
+
+        } <span class="co">// switch</span>
+    } <span class="co">// for</span>
+
+}
+
+<span class="kw">func</span> user(userID <span class="dt">string</span>, coffee, enter, exit, payback,
+    insert20, insert50, insert100 (<span class="kw">chan</span> <span class="dt">int</span>)) {
+    <span class="kw">var</span> state <span class="dt">int</span> = Initial
+
+    <span class="kw">for</span> {
+        <span class="kw">switch</span> {
+        <span class="kw">case</span> state == Initial:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> exit &lt;- <span class="dv">1</span>:
+                <span class="co">// we remain in Initial</span>
+            <span class="kw">case</span> enter &lt;- <span class="dv">1</span>:
+                state = Active
+            }
+        <span class="kw">case</span> state == Active:
+            <span class="kw">select</span> {
+            <span class="kw">case</span> exit &lt;- <span class="dv">1</span>:
+                state = Initial
+            <span class="kw">case</span> payback &lt;- <span class="dv">1</span>:
+            <span class="kw">case</span> coffee &lt;- <span class="dv">1</span>:
+                state = HasCoffee
+            <span class="kw">case</span> insert20 &lt;- <span class="dv">1</span>:
+            <span class="kw">case</span> insert50 &lt;- <span class="dv">1</span>:
+            <span class="kw">case</span> insert100 &lt;- <span class="dv">1</span>:
+
+            }
+        <span class="kw">case</span> state == HasCoffee:
+            fmt.Printf(<span class="st">&quot;%s: I got coffee </span><span class="ch">\n</span><span class="st">&quot;</span>, userID)
+            state = Active
+
+        }
+
+    }
+
+}
+
+<span class="kw">func</span> main() {
+
+    <span class="kw">var</span> coffee = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">var</span> enter = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">var</span> exit = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">var</span> payback = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">var</span> insert20 = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">var</span> insert50 = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+    <span class="kw">var</span> insert100 = <span class="fu">make</span>(<span class="kw">chan</span> <span class="dt">int</span>)
+
+    fmt.Print(<span class="st">&quot;Let&#39;s get coffee </span><span class="ch">\n</span><span class="st">&quot;</span>)
+
+    <span class="kw">go</span> coffeeMachine(coffee, enter, exit, payback,
+        insert20, insert50, insert100)
+
+    <span class="kw">go</span> user(<span class="st">&quot;Max&quot;</span>, coffee, enter, exit, payback,
+        insert20, insert50, insert100)
+
+    user(<span class="st">&quot;Moritz&quot;</span>, coffee, enter, exit, payback,
+        insert20, insert50, insert100)
+}</code></pre></div>
+</div>
+<div id="static-versus-dynamic-verification" class="slide section level1">
+<h1>Static versus dynamic verification</h1>
+<h2 id="verification-by-example">Verification by example</h2>
+<p>Consider the program.</p>
+<pre><code>int f(int n) {
+  if(n == 0)
+     return 1;
+
+  if(n &gt; 0)
+     return f(n-1);
+
+  if(n &lt; -2)
+    return f(n+1);
+
+  return f(n-1);
+}</code></pre>
+<p>We observe.</p>
+<pre><code>
+f(5) =&gt; f(4) =&gt; f(3) =&gt; f(2) =&gt; f(1) =&gt; f(0) =&gt; terminates
+
+f(10) =&gt; ... =&gt; f(0) =&gt; terminates
+
+f(-4) =&gt; f(-3) =&gt; f(-4) =&gt; f(-3) =&gt; ....
+
+does not seem to terminate (maybe we need to wait a bit longer?)</code></pre>
+<p>We verify. For all positive inputs, the function terminates. For example, via an inductive proof.</p>
+<h2 id="dynamic-verification">Dynamic verification</h2>
+<ul>
+<li><p>At run-time, execute the program.</p></li>
+<li><p>Observe its (actual) behavior.</p></li>
+<li><p>Also commonly referred to as run-time verification and testing.</p></li>
+</ul>
+<h2 id="static-verification">Static verification</h2>
+<ul>
+<li><p>Build approximation of the program's behaviour</p></li>
+<li><p>Verify that the approximation satisfies some properties.</p></li>
+<li><p>To remain decidable, we generally need to over-approximate.</p></li>
+</ul>
+<h2 id="selection-of-verification-methods">Selection of verification methods</h2>
+<h3 id="static-program-analysis">Static program analysis</h3>
+<ol style="list-style-type: decimal">
+<li><p>Data-flow analysis</p></li>
+<li><p>Control-flow analysis</p></li>
+<li><p>Type and effect systems</p></li>
+<li><p>Modelchecking</p></li>
+</ol>
+<h3 id="dynamic-program-analysis">Dynamic program analysis</h3>
+<ol style="list-style-type: decimal">
+<li><p>Testing:</p>
+<ul>
+<li><p>Unit-Tests</p></li>
+<li><p>Invariants/Assertions</p></li>
+<li><p>Oracel-based testing</p></li>
+</ul></li>
+<li><p>Run-time verification:</p>
+<ul>
+<li><p>Monitor run-time behavior</p></li>
+<li><p>Check for invalid patterns of behavior</p></li>
+</ul></li>
+</ol>
+<p>This is just a selection</p>
+</div>
+<div id="issues-static-verification" class="slide section level1">
+<h1>Issues (static verification)</h1>
+<h2 id="false-positives">False positives</h2>
+<p>To carry out the static verification, we need to <b>capture</b> the program's behavior via some appropriate model (e.g. UPPAAL is a good candidate model for Go programs).</p>
+<p>In the model we typically neglect certain details so that the static verification task becomes feasible (decidable). We say that the model overapproximates the program's behavior.</p>
+<p>Here's an example. Consider the program (sketch).</p>
+<pre><code>...             // S1
+if(cond) {
+...             // S2
+}
+else {
+...             // S3
+}</code></pre>
+<p>We add comments to label program points.</p>
+<p>In the UPPAAL we could keep track of boolean conditions such as <code>cond</code>. However, the model and the verification task becomes then rather involved and potentially no longer decidable. Keep in mind that in <code>cond</code> we can make use of arbitrary Go functions (some may not terminate!).</p>
+<p>Hence, we typically build an approximation (abstraction) where we ignore certain details. As the model shall be a faithful representation of the program, we simply assume that both branches of the conditional statement are applicable.</p>
+<p>Here's the resulting model.</p>
+<pre><code>S1 ---&gt; S2
+S2 ---&gt; S3</code></pre>
+<p>We make use of labels to represents states. As can be seen, the model is non-deterministic. We can either go from S1 to S2 or S3.</p>
+<p>A consequence of this (over)approximation is that we may encounter <b>false positives</b>:</p>
+<ol style="list-style-type: decimal">
+<li>The static verifier reports failure.</li>
+<li>The failure is observable in the model but NOT in the program.</li>
+</ol>
+<p>Recall the above example where we make the conditional statement concrete.</p>
+<pre><code>...             // S1
+if(true) {
+...             // S2
+}
+else {
+...             // S3
+}</code></pre>
+<p>The else branch is never taken because the Boolean condition always evaluates to true. However, in the transformation from the program to the model, we don't inspect Boolean conditions in detail. We assume that both Boolean results, true and false, are possible. Hence, we obtain the following model.</p>
+<pre><code>S1 ---&gt; S2
+S2 ---&gt; S3</code></pre>
+<p>Suppose there's some verification failure due to state S3. This failure is not reproducible in the program because the else branch is never taken. We encounter a <b>false positive</b>.</p>
+<h2 id="false-negatives">False negatives</h2>
+<p>In the above, we assume that the model overapproximates the program's behavior. That is, the model captures all behavior in the program but possibly more. It could happen that we make a mistake (in the transformation from program to model).</p>
+<p>Consider our running example.</p>
+<pre><code>...             // S1
+if(cond) {
+...             // S2
+}
+else {
+...             // S3
+}</code></pre>
+<p>Suppose we use the following model for verification.</p>
+<pre><code>S1 ---&gt; S2</code></pre>
+<p>The model is faulty because we igore that from program state S1 we can reach program state S3. Suppose there's a bug once we reach program state S3. This bug doesn't show up in the model. Hence, the verifier reports no failure whereas the program is faulty. We encounter a <b>false negative</b>:</p>
+<ol style="list-style-type: decimal">
+<li>The static verifier reports okay.</li>
+<li>But the program is buggy.</li>
+<li>The bug is missed because the model transformation is faulty.</li>
+</ol>
+</div>
+<div id="further-examples-for-static-verification" class="slide section level1">
+<h1>Further examples for static verification</h1>
+<h3 id="type-checking">Type checking</h3>
+<p>Types represent a (static) model of the program's run-time behavior. Typically, false positives arise but not false negatives.</p>
+<h3 id="lintfindbugs">lint/FindBugs</h3>
+<p>These tools look for suspicious program parts by using syntax checks. False positives as well as false negatives may arise.</p>
+</div>
+<div id="dynamic-verification-1" class="slide section level1">
+<h1>Dynamic verification</h1>
+<p>We consider</p>
+<pre><code>dynamic verification = testing = run-time verification</code></pre>
+<p>Different words with the same intention. Observe the actual program's behavior for a fixed number of program runs. For these fixed number of program runs we try to identify if there is a bug or not.</p>
+<h3 id="unit-tests">Unit-Tests</h3>
+<p>Pros:</p>
+<ul>
+<li>Easy to understand and write</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>Manual effort. Need to stimulate SUT (=System under Test) via suitable inputs and specify the expected output (result).</li>
+</ul>
+<h3 id="invariantsassertions">Invariants/Assertions</h3>
+<p>Assertions impose conditions on program locations.</p>
+<pre><code>assert(x &gt; 0)</code></pre>
+<p>Invariants include more complex properties that not only involves program locations but also functions.</p>
+<pre><code>forall x. switchLowHigh(switchLowHigh(x)) == x</code></pre>
+<p>Assertions typically make use of Boolean conditions whereas invariants involve more complex (predicate logic) statements.</p>
+<h3 id="oracle-based-testing">Oracle-based testing</h3>
+<p>Oracle = able to predict expected output for any input.</p>
+<p>Where does the oracle come from?</p>
+<ol style="list-style-type: decimal">
+<li>Independent implementation</li>
+<li>Stable release</li>
+<li>...</li>
+</ol>
+</div>
+<div id="trace-based-runtime-verification-rv" class="slide section level1">
+<h1>Trace-Based Runtime Verification (RV)</h1>
+<p>Special instance where we are interested in the sequence of events (=trace) emitted by a program.</p>
+<p><em>Monitoring of the runtime behavior of programs to ensure that a given correctness property is satisfied.</em></p>
+<ol style="list-style-type: decimal">
+<li><p>Instrumention of a program to monitor the runtime behavior we are interested in.</p></li>
+<li><p>Recording of runtime behavior as a sequence of events (= program trace).</p></li>
+<li><p>Checking that the program trace satisfies the correctness property (= trace validation).</p></li>
+</ol>
+<h2 id="difference-to-modelchecking-mc">Difference to Modelchecking (MC)</h2>
+<ul>
+<li><p>MC considers <em>all</em> possible program runs. In RV we consider a <em>single</em> program run.</p></li>
+<li><p>MC operates on <em>infinite</em> traces whereas RV is restricted to <em>finite</em> traces.</p></li>
+</ul>
+<p>For example, consider the UPPAAL modelchecker and the examples from the Autonomous Systems course. A typical MC example is to guarantee that the user eventually obtains a coffee.</p>
+<p>In RV we can only check <em>safety</em> properties (&quot;something bad will never happen&quot;) whereas MC typically can also deal with <em>liveness</em> properties (&quot;something good will eventually happen&quot;).</p>
+<h2 id="rv-topics">RV Topics</h2>
+<ul>
+<li><p>Program instrumentation:</p>
+<ul>
+<li><p><b>Efficiency</b>. As little overhead as possible (time and space). Also important to monitor the 'true' runtime behavior of programs (e.g. consider concurrent programs).</p></li>
+<li><p>Either <b>online</b> or <b>offline</b> (store trace in a log file for example).</p></li>
+<li><p><b>Compiler</b> extension versus <b>domain-specific embedding</b>.</p></li>
+</ul></li>
+<li><p>Trace validation:</p>
+<ul>
+<li><p><b>Pattern formalisms</b> to specify correctness (safety) properties, e.g. regular expressions, LTL, ...</p></li>
+<li><p><b>Efficient algorithms</b> to implement pattern formalisms which work under the offline as well as online monitoring assumption.</p></li>
+<li><p><b>Explanation of results</b> (beyond yes/no answers).</p></li>
+</ul></li>
+</ul>
+</div>
+<div id="staticdynamic-verification-examples" class="slide section level1">
+<h1>Static/Dynamic Verification Examples</h1>
+<p><a href="./verification-notes.html">notes resource usage verification</a></p>
+<p><a href="./verification-notes2.html">notes dynamic verification (data races and deadlocks)</a></p>
+<h2 id="static-trace-based-deadlock-analysis-for-synchronous-mini-go">Static Trace-Based Deadlock Analysis for Synchronous Mini-Go</h2>
+<p><a href="https://arxiv.org/abs/1608.08330">paper</a> <a href="http://www.home.hs-karlsruhe.de/~suma0002/talks/aplas16.pdf">talk</a></p>
+<h2 id="trace-based-run-time-analysis-of-message-passing-go-programs">Trace-Based Run-time Analysis of Message-Passing Go Programs</h2>
+<p><a href="https://arxiv.org/abs/1709.01588">paper</a> <a href="http://www.home.hs-karlsruhe.de/~suma0002/talks/hvc17.pdf">talk</a></p>
+<!--
+
+# Further stuff
+
+LTL RV
+
+motivate why LTL more suitable here
+
+Flat LTL
+
+RV in Go
+
+-->
+</div>
+</body>
+</html>
