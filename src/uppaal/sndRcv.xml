@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Place global declarations here.
+chan ch;
+int ch_x;</declaration><template><name x="5" y="5">Send</name><declaration>// Place local declarations here.
+</declaration><location id="id0" x="-32" y="-152"></location><location id="id1" x="-200" y="-152"></location><init ref="id1"/><transition><source ref="id1"/><target ref="id0"/><label kind="synchronisation" x="-104" y="-320">ch!</label><label kind="assignment" x="-104" y="-296">ch_x := 10</label><nail x="-120" y="-296"/><nail x="-32" y="-168"/></transition><transition><source ref="id0"/><target ref="id1"/><nail x="-112" y="-56"/></transition><transition><source ref="id1"/><target ref="id0"/><label kind="synchronisation" x="-128" y="-176">ch!</label><label kind="assignment" x="-144" y="-152">ch_x := 5</label></transition></template><template><name>Receive</name><declaration>int y;</declaration><location id="id2" x="-56" y="-56"></location><location id="id3" x="-184" y="-56"><committed/></location><location id="id4" x="-312" y="-56"></location><init ref="id4"/><transition><source ref="id2"/><target ref="id4"/><nail x="-136" y="32"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="assignment" x="-160" y="-80">y := ch_x</label></transition><transition><source ref="id4"/><target ref="id3"/><label kind="synchronisation" x="-280" y="-80">ch?</label></transition></template><system>// Place template instantiations here.
+
+
+// List one or more processes to be composed into a system.
+system Send, Receive;</system></nta>

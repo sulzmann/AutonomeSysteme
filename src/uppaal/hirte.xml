@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Place global declarations here.
+chan to, back;</declaration><template><name x="5" y="5">Hirte</name><declaration>// Place local declarations here.
+</declaration><location id="id0" x="64" y="-64"><name x="54" y="-94">right</name></location><location id="id1" x="-120" y="-64"><name x="-130" y="-94">left</name></location><init ref="id1"/><transition><source ref="id0"/><target ref="id1"/><nail x="-32" y="16"/></transition><transition><source ref="id0"/><target ref="id1"/><label kind="synchronisation" x="-56" y="-56">back!</label><nail x="-32" y="-32"/></transition><transition><source ref="id1"/><target ref="id0"/><nail x="-32" y="-144"/><nail x="48" y="-64"/></transition><transition><source ref="id1"/><target ref="id0"/><label kind="synchronisation" x="-56" y="-88">to!</label><nail x="-32" y="-96"/><nail x="40" y="-64"/></transition></template><template><name>Thing</name><location id="id2" x="32" y="0"><name x="22" y="-30">right</name></location><location id="id3" x="-120" y="0"><name x="-130" y="-30">left</name></location><init ref="id3"/><transition><source ref="id2"/><target ref="id3"/><label kind="synchronisation" x="-64" y="40">back?</label><nail x="-48" y="40"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="synchronisation" x="-64" y="-64">to?</label><nail x="-48" y="-40"/></transition></template><system>// Place template instantiations here.
+Ziege = Thing();
+Wolf = Thing();
+Kohl = Thing();
+
+// List one or more processes to be composed into a system.
+system Hirte, Ziege, Wolf, Kohl;</system></nta>
