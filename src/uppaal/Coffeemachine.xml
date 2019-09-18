@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+chan insert20, insert50, insert100;
+chan payback, coffee;
+chan enter, exitt;</declaration>
+	<template>
+		<name x="5" y="5">User</name>
+		<declaration>// Place local declarations here.
+</declaration>
+		<location id="id0" x="176" y="-2424">
+			<name x="104" y="-2416">hascoffee</name>
+		</location>
+		<location id="id1" x="-128" y="-2296">
+			<name x="-168" y="-2328">initial</name>
+		</location>
+		<location id="id2" x="-24" y="-2424">
+			<name x="-80" y="-2416">active</name>
+		</location>
+		<init ref="id1"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id2"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id0"/>
+			<label kind="synchronisation" x="128" y="-2496">coffee!</label>
+			<nail x="24" y="-2440"/>
+			<nail x="88" y="-2456"/>
+			<nail x="104" y="-2472"/>
+			<nail x="176" y="-2472"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-168" y="-2248">exitt!</label>
+			<nail x="-128" y="-2224"/>
+			<nail x="-208" y="-2224"/>
+			<nail x="-208" y="-2296"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="72" y="-2376">payback!</label>
+			<nail x="0" y="-2392"/>
+			<nail x="24" y="-2360"/>
+			<nail x="48" y="-2352"/>
+			<nail x="136" y="-2352"/>
+			<nail x="136" y="-2296"/>
+			<nail x="0" y="-2296"/>
+			<nail x="0" y="-2352"/>
+			<nail x="-8" y="-2392"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-64" y="-2336">exitt!</label>
+			<nail x="-24" y="-2296"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-120" y="-2376">enter!</label>
+			<nail x="-128" y="-2352"/>
+			<nail x="-40" y="-2352"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-168" y="-2488">insert20!</label>
+			<nail x="-176" y="-2424"/>
+			<nail x="-176" y="-2464"/>
+			<nail x="-112" y="-2464"/>
+			<nail x="-80" y="-2440"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-16" y="-2576">insert100!</label>
+			<nail x="-24" y="-2552"/>
+			<nail x="72" y="-2552"/>
+			<nail x="72" y="-2480"/>
+			<nail x="16" y="-2464"/>
+			<nail x="-8" y="-2456"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="-168" y="-2576">insert50!</label>
+			<nail x="-64" y="-2464"/>
+			<nail x="-72" y="-2472"/>
+			<nail x="-80" y="-2488"/>
+			<nail x="-88" y="-2504"/>
+			<nail x="-176" y="-2504"/>
+			<nail x="-176" y="-2552"/>
+			<nail x="-48" y="-2552"/>
+			<nail x="-48" y="-2464"/>
+		</transition>
+	</template>
+	<template>
+		<name>Coffeemachine</name>
+		<parameter>const int initValue</parameter>
+		<declaration>int acc = initValue;</declaration>
+		<location id="id3" x="0" y="192">
+			<name x="-48" y="160">initial</name>
+		</location>
+		<location id="id4" x="0" y="0">
+			<name x="-56" y="-24">active</name>
+		</location>
+		<init ref="id3"/>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="48" y="168">exitt?</label>
+			<nail x="88" y="192"/>
+			<nail x="88" y="272"/>
+			<nail x="0" y="272"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="guard" x="112" y="88">acc &gt; 0</label>
+			<label kind="synchronisation" x="112" y="104">payback?</label>
+			<label kind="assignment" x="112" y="120">acc = 0</label>
+			<nail x="40" y="40"/>
+			<nail x="104" y="72"/>
+			<nail x="104" y="144"/>
+			<nail x="24" y="144"/>
+			<nail x="24" y="40"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-40" y="80">exitt?</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="guard" x="-120" y="-216">acc &gt;= 150</label>
+			<label kind="synchronisation" x="-120" y="-200">coffee?</label>
+			<label kind="assignment" x="-120" y="-184">acc = acc - 150</label>
+			<nail x="-32" y="-48"/>
+			<nail x="-128" y="-64"/>
+			<nail x="-128" y="-152"/>
+			<nail x="-16" y="-152"/>
+			<nail x="-16" y="-48"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-120" y="80">enter?</label>
+			<nail x="-128" y="192"/>
+			<nail x="-128" y="0"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="24" y="-200">insert20?</label>
+			<label kind="assignment" x="24" y="-184">acc = acc + 20</label>
+			<nail x="16" y="-56"/>
+			<nail x="16" y="-152"/>
+			<nail x="120" y="-152"/>
+			<nail x="120" y="-104"/>
+			<nail x="24" y="-40"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="192" y="0">insert100?</label>
+			<label kind="assignment" x="192" y="16">acc = acc + 100</label>
+			<nail x="56" y="0"/>
+			<nail x="184" y="0"/>
+			<nail x="184" y="64"/>
+			<nail x="136" y="64"/>
+			<nail x="64" y="16"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="192" y="-96">insert50?</label>
+			<label kind="assignment" x="192" y="-80">acc = acc + 50</label>
+			<nail x="64" y="-40"/>
+			<nail x="136" y="-96"/>
+			<nail x="184" y="-96"/>
+			<nail x="184" y="-24"/>
+			<nail x="96" y="-24"/>
+			<nail x="64" y="-24"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Machine = Coffeemachine(0);
+Person1 = User();
+Person2 = User();
+
+// List one or more processes to be composed into a system.
+system Person1, Person2, Machine;</system>
+	<queries>
+		<query>
+			<formula>A[] not (Person1.hascoffee)
+
+// Can Person1 get coffee? 
+			</formula>
+			<comment>
+			</comment>
+		</query>
+		<query>
+			<formula>A[] not(Person1.hascoffee and Person2.hascoffee)
+
+// More than one person can get coffee at the same time
+			</formula>
+			<comment>
+			</comment>
+		</query>
+	</queries>
+</nta>

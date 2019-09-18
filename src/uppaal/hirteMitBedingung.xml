@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'><nta><declaration>// Place global declarations here.
+chan to, back;
+
+
+
+// true = linke Uferseite   false = rechte Uferseite
+bool H = true;
+bool W = true;
+bool K = true;
+bool Z = true;
+
+
+// Config is valid (true) if w-z and k-z are not left alone
+// on either side of the river
+bool checkConfig (bool h, bool w, bool k, bool z) {
+ bool c;
+
+  c = ! (   (w == true &amp;&amp; z == true &amp;&amp; h == false &amp;&amp; k == false)
+         || (w == false &amp;&amp; z == false &amp;&amp; h == true &amp;&amp; k == true)
+         || (k == true &amp;&amp; z == true &amp;&amp; h == false &amp;&amp; w == false)
+         || (k == false &amp;&amp; z == false &amp;&amp; h == true &amp;&amp; w == true)
+        );
+
+return c;
+
+}
+
+// Check configuration, assuming that 'me' (= w,k,z) will move,
+// so we simply check if the move is valid by
+// flipping 'me' *and*  its partner h (the hirte)
+// N.B. If h moves independently, we won't use the functions below
+bool checkConfigMe (int me, bool h, bool w, bool k, bool z) {
+   bool c;
+   if (me == 2) { // Wolf
+      c = checkConfig(!h,!w,k,z);
+   } else if (me == 3) { // Kohl
+      c = checkConfig(!h,w,!k,z);
+   } else if (me == 4) { // Ziege
+      c = checkConfig(!h,w,k,!z);
+   } else { c = false; } // whatever
+  return c;
+}
+
+// Perform the move of 'me' (= w,k,z) and its partner h (the hirte)
+void moveMe (int me, bool &amp;h, bool &amp;w, bool &amp;k, bool &amp;z) {
+     if (me == 2) { // Wolf
+      w = !w;
+      h = !h;
+   } else if (me == 3) { // Kohl
+      k = !k;
+      h = !h;
+   } else if (me == 4) { // Ziege
+      z = !z;
+      h = !h;
+   } 
+}</declaration><template><name x="5" y="5">Hirte</name><declaration>// Place local declarations here.
+</declaration><location id="id0" x="200" y="-64"><name x="190" y="-94">right</name></location><location id="id1" x="-248" y="-56"><name x="-258" y="-86">left</name></location><init ref="id1"/><transition><source ref="id0"/><target ref="id1"/><label kind="guard" x="-184" y="120">checkConfig(true,W,K,Z)</label><label kind="assignment" x="-8" y="120">H = true</label><nail x="-32" y="112"/></transition><transition><source ref="id0"/><target ref="id1"/><label kind="synchronisation" x="-56" y="-32">back!</label><nail x="-32" y="-8"/></transition><transition><source ref="id1"/><target ref="id0"/><label kind="guard" x="-208" y="-280">checkConfig(false,W,K,Z)</label><label kind="assignment" x="-16" y="-280">H = false</label><nail x="-32" y="-248"/><nail x="104" y="-128"/></transition><transition><source ref="id1"/><target ref="id0"/><label kind="synchronisation" x="-40" y="-128">to!</label><nail x="-32" y="-152"/><nail x="72" y="-96"/></transition></template><template><name>Thing</name><parameter> int me, bool &amp;h, bool &amp;w, bool &amp;k, bool &amp;z</parameter><location id="id2" x="176" y="0"><name x="166" y="-30">right</name></location><location id="id3" x="-264" y="0"><name x="-274" y="-30">left</name></location><init ref="id3"/><transition><source ref="id2"/><target ref="id3"/><label kind="guard" x="-288" y="144">checkConfigMe(me,h,w,k,z)</label><label kind="synchronisation" x="-64" y="152">back?</label><label kind="assignment" x="16" y="160">moveMe(me,h,w,k,z)</label><nail x="-48" y="136"/></transition><transition><source ref="id3"/><target ref="id2"/><label kind="guard" x="-256" y="-144">checkConfigMe(me,h,w,k,z)</label><label kind="synchronisation" x="-56" y="-160">to?</label><label kind="assignment" x="8" y="-144">moveMe(me,h,w,k,z)</label><nail x="-48" y="-120"/></transition></template><system>// Place template instantiations here.
+Ziege = Thing(4, H,W,K,Z);
+Wolf = Thing(2,H,W,K,Z);
+Kohl = Thing(3,H,W,K,Z);
+
+// List one or more processes to be composed into a system.
+system Hirte, Ziege, Wolf, Kohl;</system></nta>
