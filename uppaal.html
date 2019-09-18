@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Martin Sulzmann" />
+  <title>UPPAAL Labor</title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<div id="header">
+<h1 class="title">UPPAAL Labor</h1>
+<h2 class="author">Martin Sulzmann</h2>
+</div>
+<p>UPPAAL ist frei verfügbar (akademische Lizenz): http://www.uppaal.org/</p>
+<p>Die grundlegenden Elemente von UPPAAL werden in der Vorlesung erklärt. Unten finden Sie eine Reihe von Beispielen als auch Aufgaben die Sie im Labor bearbeiten sollen.</p>
+<p>Weitere Hilfestellungen finden Sie hier: http://www.it.uu.se/research/group/darts/uppaal/small_tutorial.pdf Allgemein ist UPPAAL &quot;einfach erlernbar&quot; und viele Fragen lassen sich via der Online Hilfe beantworten.</p>
+<p>Eine trickreiche Sache ist die Einstellung des &quot;proxies&quot;, falls Sie UPPAAL innerhalb der HS KA benutzen wollen. (FYI, UPPAAL benötigt eine Verbindung zu dem Lizenzserver). Hilfestellung zum &quot;proxy&quot; finden Sie hier (siehe Punkt 15): http://www.uppaal.com/index.php?sida=201&amp;rubrik=95</p>
+<p>[EDIT:] Auf meinem Mac scheint eine extra Konfiguration wegen proxy aktuell nicht mehr notwendig.</p>
+<p><a href="./uebung-uppaal.pdf">Übungsblatts</a></p>
+<h2 id="beispiele">Beispiele</h2>
+<p>xml das Modell und q die Spezifikation (&quot;queries&quot;), jeweils herunterladen via folgenden links</p>
+<p>Kaffeemaschine <a href="./src/uppaal/coffeeMachineWithUser.xml">xml</a> <a href="./src/uppaal/coffeeMachineWithUser.q">q</a></p>
+<p>Hirte <a href="./src/uppaal/hirte.xml">xml</a> <a href="./src/uppaal/hirte.q">q</a></p>
+<p>Bankkonto <a href="./src/uppaal/userAccount.xml">xml</a> <a href="./src/uppaal/userAccount.q">q</a></p>
+<p>Lampe <a href="./src/uppaal/lamp.xml">xml</a> Modellierung einer Tischlampe mit Helligkeit</p>
+<p>SendReceive <a href="./src/uppaal/sndRcv.xml">xml</a> Modellierung von Nachrichtenbasierter Kommunikation</p>
+<h2 id="muserlösungen">Muserlösungen</h2>
+<h3 id="kaffeemaschine-mit-münzen">Kaffeemaschine (mit Münzen)</h3>
+<p><a href="./src/uppaal/Coffeemachine.xml">xml</a> <a href="./src/uppaal/Coffeemachine.q">q</a></p>
+<p>Folgendes Verhalten lässt sich beobachten (via Simulator)</p>
+<ol style="list-style-type: decimal">
+<li>User1: Wirft 3 Euro ein, bekommt Kaffee</li>
+<li>User2: Bekommt Kaffee!</li>
+<li>Sprich, User1 bezahlt für User2</li>
+</ol>
+<p>Beachte: Die Aufgabenbeschreibung sagt nichts gegenteiliges aus. Vorteil der formalen Modellierung Wir können dieses Verhalten im Modell genau nachvollziehen (bevor man viel Arbeit in die eigentliche Implementierung steckt)</p>
+<p>Aufgabe: Wie könnte man durch eine geeignete Query (TCTL Formel) obigen Ablauf herauskriegen?</p>
+<h3 id="sleeping-barber">Sleeping Barber</h3>
+<p><a href="./src/uppaal/SleepingBarber.xml">xml</a></p>
+<p>Sehr einfach gehalten. Als Erweiterung könnten Sie (eine endliche Anzahl) von Wartestühlen modellieren Beachte: Die Modellierung im Übungsblatt (2-uebung-state-cfa) unterscheidet sich dadurch, dass ein Kunde entweder direkt zum Barbier geht oder zuerst auf einem Stuhl Platz nimmt.</p>
+<h3 id="hirte-mit-randbedingung">Hirte mit Randbedingung</h3>
+<p><a href="./src/uppaal/hirteMitBedingung.xml">xml</a> <a href="./src/uppaal/hirteMitBedingung.q">q</a></p>
+<p>In UPPAAL können wir leider nicht direkt den aktiven Zustand eines Automaten abfragen. Wir führen deshalb (globale) Variablen ein, die den aktuellen Zustand repräsentieren Transitionen bekommen guards (Randbedingungen) die garantieren, dass z.B. der Wolf nicht alleine mit der Ziege auf einer Seite des Ufers bleibt</p>
+</body>
+</html>
